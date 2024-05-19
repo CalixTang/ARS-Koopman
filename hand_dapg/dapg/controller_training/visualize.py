@@ -107,7 +107,10 @@ parser.add_argument('--policy', type=str, required=True, help='absolute path of 
 parser.add_argument('--eval_data', type=str, required=True, help='absolute path to evaluation data')
 parser.add_argument('--visualize', type=str, required=True, help='determine if visualizing the policy or not')
 parser.add_argument('--save_fig', type=str, required=True, help='determine if saving all generated figures')
-parser.add_argument('--only_record_video', type=str, required=False, default='False', help='determine if only recording the policy rollout')
+parser.add_argument('--only_record_video', required = False, action = 'store_true', help='determine if only recording the policy rollout')
+parser.add_argument('--koopman_path', type=str, required=False, default = None, help = 'path to koopman matrix')
+parser.add_argument('--video_path', required = False, default = './Videos/CIMER.mp4')
+parser.add_argument('--num_episodes', type = int, required= False, default = -1)
 
 args = parser.parse_args()
 with open(args.config, 'r') as f:
@@ -120,11 +123,15 @@ Save_fig = False
 if args.save_fig == "True":
     Save_fig = True
 Only_record_video = False
-if args.only_record_video == "True":
+if args.only_record_video:
     Only_record_video = True
 assert any([job_data['algorithm'] == a for a in ['NPG', 'TRPO', 'PPO']])  # start from natural policy gradient for training
 assert os.path.exists(os.getcwd() + job_data['matrix_file'] + job_data['env'].split('-')[0] + '/koopmanMatrix.npy')  # loading KODex reference dynamics
-KODex = np.load(os.getcwd() + job_data['matrix_file'] + job_data['env'].split('-')[0] + '/koopmanMatrix.npy')
+KODex = None
+if args.koopman_path is not None:
+    KODex = np.load(args.koopman_path)
+else:
+    KODex = np.load(os.getcwd() + job_data['matrix_file'] + job_data['env'].split('-')[0] + '/koopmanMatrix.npy')
 
 # ===============================================================================
 # Set up the controller parameter
@@ -173,9 +180,13 @@ if task_id == 'relocate':
     e = GymEnv(job_data['env'], job_data['control_mode'], job_data['object'])  # an unified env wrapper for all kind of envs
 else:
     e = GymEnv(job_data['env'], job_data['control_mode'])  # an unified env wrapper for other envs
-policy = pickle.load(open(args.policy, 'rb'))  
+policy = pickle.load(open(args.policy, 'rb')) 
+
 Koopman_obser = DraftedObservable(num_robot_s, num_object_s)
 demos = pickle.load(open(args.eval_data, 'rb'))
+
+num_episodes = len(demos) if args.num_episodes == -1 else args.num_episodes
+
 Eval_data = demo_playback(demos, len(demos), task_id)
 coeffcients = dict()
 coeffcients['task_ratio'] = job_data['task_ratio']
@@ -634,6 +645,7 @@ if not Only_record_video:
             #     plt.close()
 else:  # Only_record_video
     if task_id == 'relocate':
-        e.Visualze_CIMER_policy(Eval_data, Simple_PID, coeffcients, Koopman_obser, KODex, task_horizon, job_data['future_s'], job_data['history_s'], policy, num_episodes=len(demos), gamma = gamma, obj_dynamics = job_data['obj_dynamics'], visual = visualize, object_name = job_data['object'])  # noise-free actions
+        # e.Visualze_CIMER_policy(Eval_data, Simple_PID, coeffcients, Koopman_obser, KODex, task_horizon, job_data['future_s'], job_data['history_s'], policy, num_episodes=len(demos), gamma = gamma, obj_dynamics = job_data['obj_dynamics'], visual = visualize, object_name = job_data['object'], record = True)  # noise-free actions
+        e.record_relocate(Eval_data, Simple_PID, coeffcients, Koopman_obser, KODex, task_horizon, job_data['future_s'], job_data['history_s'], num_episodes=num_episodes, gamma = gamma, obj_dynamics = job_data['obj_dynamics'], visual = visualize, vid_path = args.video_path)
     else:
-        e.Visualze_CIMER_policy(Eval_data, Simple_PID, coeffcients, Koopman_obser, KODex, task_horizon, job_data['future_s'], job_data['history_s'], policy, num_episodes=len(demos), gamma = gamma, obj_dynamics = job_data['obj_dynamics'], visual = visualize)  # noise-free actions        
+        e.Visualze_CIMER_policy(Eval_data, Simple_PID, coeffcients, Koopman_obser, KODex, task_horizon, job_data['future_s'], job_data['history_s'], policy, num_episodes=len(demos), gamma = gamma, obj_dynamics = job_data['obj_dynamics'], visual = visualize, record = True)  # noise-free actions        

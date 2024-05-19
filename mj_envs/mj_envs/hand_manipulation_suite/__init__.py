@@ -30,7 +30,7 @@ from mj_envs.hand_manipulation_suite.pen_v0 import PenEnvV0
 register(
     id='relocate-v0',
     entry_point='mj_envs.hand_manipulation_suite:RelocateEnvV0',
-    max_episode_steps=200,
+    max_episode_steps=500, #200
 )
 from mj_envs.hand_manipulation_suite.relocate_v0 import RelocateEnvV0
 

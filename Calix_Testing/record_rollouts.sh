@@ -1,0 +1,3 @@
+#!/bin/bash
+cd ..
+python3 hand_dapg/dapg/controller_training/run_relocate.py --eval_data Samples/Relocate/Relocate_task.pickle --visualize False --save_fig False --object foam_brick --config Samples/Relocate/CIMER/job_config.json --policy Samples/Relocate/CIMER/best_eval_sr_policy.pickle --dynamic_mode_path Calix_Testing/k_mat_relocate/ball_eigvecs_first_episode.npy --record_video --video_path ./Videos/ball_dmd_transfer_full_mode_reconst.mp4 --num_episodes 20
