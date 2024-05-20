@@ -1,0 +1,90 @@
+---------------------------------------
+Begin Slurm Prolog: May-20-2024 17:10:25
+Job ID:    137032
+User ID:   ctang306
+Account:   gts-hravichandar3-starlab
+Job name:  ARS_slurm
+Partition: cpu-large
+QOS:       inferno
+---------------------------------------
+2024-05-20 17:10:36,331	INFO usage_lib.py:417 -- Usage stats collection is enabled by default without user confirmation because this terminal is detected to be non-interactive. To disable this, add `--disable-usage-stats` to the command that starts the cluster, or run the following command: `ray disable-usage-stats` before starting the cluster. See https://docs.ray.io/en/master/cluster/usage-stats.html for more details.
+2024-05-20 17:10:36,332	INFO scripts.py:744 -- Local node IP: 172.27.145.19
+2024-05-20 17:10:41,325	SUCC scripts.py:781 -- --------------------
+2024-05-20 17:10:41,325	SUCC scripts.py:782 -- Ray runtime started.
+2024-05-20 17:10:41,326	SUCC scripts.py:783 -- --------------------
+2024-05-20 17:10:41,326	INFO scripts.py:785 -- Next steps
+2024-05-20 17:10:41,326	INFO scripts.py:788 -- To add another node to this Ray cluster, run
+2024-05-20 17:10:41,326	INFO scripts.py:796 --   ray start --address='172.27.145.19:6379'
+2024-05-20 17:10:41,326	INFO scripts.py:800 -- To connect to this Ray cluster:
+2024-05-20 17:10:41,326	INFO scripts.py:802 -- import ray
+2024-05-20 17:10:41,326	INFO scripts.py:810 -- ray.init()
+2024-05-20 17:10:41,326	INFO scripts.py:834 -- To terminate the Ray runtime, run
+2024-05-20 17:10:41,326	INFO scripts.py:835 --   ray stop
+2024-05-20 17:10:41,326	INFO scripts.py:838 -- To view the status of the cluster, use
+2024-05-20 17:10:41,326	INFO scripts.py:839 --   ray status
+2024-05-20 17:10:59,528	INFO worker.py:1458 -- Connecting to existing Ray cluster at address: 172.27.145.19:6379...
+2024-05-20 17:10:59,545	INFO worker.py:1642 -- Connected to Ray cluster.
+ARS parameters: {'task_id': 'relocate', 'n_iter': 300, 'n_directions': 16, 'deltas_used': 8, 'step_size': 0.05, 'delta_std': 0.02, 'n_workers': 1, 'rollout_length': 500, 'shift': 0, 'seed': 237, 'policy_type': 'relocate', 'dir_path': 'data', 'filter': 'MeanStdFilter', 'object': 'ball', 'robot_dim': 30, 'obj_dim': 12, 'env_init_path': 'Samples/Relocate/Relocate_task_20000_samples.pickle'}
+Policy parameters: {'type': 'relocate', 'ob_filter': 'MeanStdFilter', 'ob_dim': 0, 'ac_dim': 0, 'robot_dim': 30, 'obj_dim': 12, 'object': 'ball', 'PID_controller': <mjrl.KODex_utils.Controller.PID object at 0x2aab41b8b490>}
+Initialize ARSLearner object
+[32;1mLogging data to data/1716239474000514466/log.txt[0m
+relocate-v0
+Creating deltas table.
+Created deltas table.
+Initializing workers.
+Initialized workers.
+Initialization of ARS complete.
+Starting training
+  0%|          | 0/300 [00:00<?, ?it/s]  0%|          | 0/300 [00:04<?, ?it/s]
+[2m[36m(Worker pid=163660)[0m relocate-v0
+[2m[36m(Worker pid=163660)[0m Worker initialized
+Traceback (most recent call last):
+  File "./ARS/code/ars_koopman.py", line 492, in <module>
+    trained_policy = run_ars(params)
+  File "./ARS/code/ars_koopman.py", line 451, in run_ars
+    ARS.train(params['n_iter'])
+  File "./ARS/code/ars_koopman.py", line 346, in train
+    step_rewards = self.train_step()
+  File "./ARS/code/ars_koopman.py", line 330, in train_step
+    g_hat, rewards = self.aggregate_rollouts()                  
+  File "./ARS/code/ars_koopman.py", line 272, in aggregate_rollouts
+    results_one = ray.get(rollout_ids_one)
+  File "/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/_private/auto_init_hook.py", line 24, in auto_init_wrapper
+    return fn(*args, **kwargs)
+  File "/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+    return func(*args, **kwargs)
+  File "/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/_private/worker.py", line 2547, in get
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(AssertionError): [36mray::Worker.do_rollouts()[39m (pid=163660, ip=172.27.145.19, actor_id=19e6c04d8e19a346bf0772ed01000000, repr=<ars_koopman.Worker object at 0x2aaab57ee110>)
+  File "./ARS/code/ars_koopman.py", line 141, in do_rollouts
+    pos_reward, pos_steps  = self.rollout(shift = shift)
+  File "./ARS/code/ars_koopman.py", line 92, in rollout
+    action = self.policy.act(ob)
+  File "/storage/scratch1/3/ctang306/ARS-Koopman/ARS/code/policies.py", line 112, in act
+    x = self.observation_filter(x, update=self.update_filter)
+  File "/storage/scratch1/3/ctang306/ARS-Koopman/ARS/code/filter.py", line 208, in __call__
+    self.rs.push(x)
+  File "/storage/scratch1/3/ctang306/ARS-Koopman/ARS/code/filter.py", line 90, in push
+    .format(x.shape, self._M.shape))
+AssertionError: x.shape = (42,), self.shape = (0,)
+srun: error: atl1-1-02-004-2-1: task 0: Exited with exit code 1
+2024-05-20 17:11:40,147	VINFO scripts.py:1094 -- Send termination request to `/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/core/src/ray/raylet/raylet --raylet_socket_name=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/sockets/raylet --store_socket_name=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/sockets/plasma_store --object_manager_port=0 --min_worker_port=10002 --max_worker_port=19999 --node_manager_port=0 --node_ip_address=172.27.145.19 --maximum_startup_concurrency=24 --static_resource_list=node:172.27.145.19,1.0,node:__internal_head__,1.0,CPU,24,memory,566964136960,object_store_memory,200000000000 "--python_worker_command=/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/bin/python /storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/_private/workers/setup_worker.py /storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/_private/workers/default_worker.py --node-ip-address=172.27.145.19 --node-manager-port=RAY_NODE_MANAGER_PORT_PLACEHOLDER --object-store-name=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/sockets/plasma_store --raylet-name=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/sockets/raylet --redis-address=None --temp-dir=/scratch/137032/ray --metrics-agent-port=59568 --runtime-env-agent-port=61359 --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --runtime-env-agent-port=61359 --gcs-address=172.27.145.19:6379 --session-name=session_2024-05-20_17-10-36_343898_162460 --temp-dir=/scratch/137032/ray --webui= --cluster-id=652331467dba347c30cbe030273f451b05ac69e86859965d029a50ef RAY_WORKER_DYNAMIC_OPTION_PLACEHOLDER" "--java_worker_command=/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/bin/python /storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/_private/workers/setup_worker.py -Dray.address=172.27.145.19:6379 -Dray.raylet.node-manager-port=RAY_NODE_MANAGER_PORT_PLACEHOLDER -Dray.object-store.socket-name=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/sockets/plasma_store -Dray.raylet.socket-name=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/sockets/raylet -Dray.redis.password= -Dray.node-ip=172.27.145.19 -Dray.home=/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/../.. -Dray.logging.dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/logs -Dray.session-dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460 RAY_WORKER_DYNAMIC_OPTION_PLACEHOLDER io.ray.runtime.runner.worker.DefaultWorker" --cpp_worker_command= --native_library_path=/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/cpp/lib --temp_dir=/scratch/137032/ray --session_dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460 --log_dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/logs --resource_dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/runtime_resources --metrics-agent-port=59568 --metrics_export_port=62081 --runtime_env_agent_port=61359 --object_store_memory=200000000000 --plasma_directory=/dev/shm --ray-debugger-external=0 --gcs-address=172.27.145.19:6379 --session-name=session_2024-05-20_17-10-36_343898_162460 --labels= --cluster-id=652331467dba347c30cbe030273f451b05ac69e86859965d029a50ef --head --num_prestart_python_workers=24 "--dashboard_agent_command=/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/bin/python -u /storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/dashboard/agent.py --node-ip-address=172.27.145.19 --metrics-export-port=62081 --dashboard-agent-port=59568 --listen-port=52365 --node-manager-port=RAY_NODE_MANAGER_PORT_PLACEHOLDER --object-store-name=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/sockets/plasma_store --raylet-name=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/sockets/raylet --temp-dir=/scratch/137032/ray --session-dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460 --log-dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/logs --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --session-name=session_2024-05-20_17-10-36_343898_162460 --gcs-address=172.27.145.19:6379 --minimal" "--runtime_env_agent_command=/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/bin/python -u /storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/_private/runtime_env/agent/main.py --node-ip-address=172.27.145.19 --runtime-env-agent-port=61359 --gcs-address=172.27.145.19:6379 --runtime-env-dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/runtime_resources --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --log-dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/logs --temp-dir=/scratch/137032/ray"` (via SIGTERM)
+2024-05-20 17:11:40,680	INFO scripts.py:1121 -- 1/1 stopped.2024-05-20 17:11:40,774	VINFO scripts.py:1094 -- Send termination request to `/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/bin/python -u /storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/autoscaler/_private/monitor.py --logs-dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/logs --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --gcs-address=172.27.145.19:6379 --monitor-ip=172.27.145.19` (via SIGTERM)
+2024-05-20 17:11:40,794	VINFO scripts.py:1094 -- Send termination request to `/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/bin/python -u /storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/_private/log_monitor.py --logs-dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/logs --gcs-address=172.27.145.19:6379 --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5` (via SIGTERM)
+2024-05-20 17:11:40,801	VINFO scripts.py:1094 -- Send termination request to `/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/bin/python -u /storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/_private/log_monitor.py --logs-dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/logs --gcs-address=172.27.145.19:6379 --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5` (via SIGTERM)
+2024-05-20 17:11:40,813	VINFO scripts.py:1094 -- Send termination request to `/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/bin/python /storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/dashboard/dashboard.py --host=127.0.0.1 --port=8265 --port-retries=0 --temp-dir=/scratch/137032/ray --log-dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/logs --session-dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460 --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --gcs-address=172.27.145.19:6379 --node-ip-address=172.27.145.19 --minimal` (via SIGTERM)
+2024-05-20 17:11:41,189	INFO scripts.py:1121 -- 1/3 stopped.2024-05-20 17:11:41,189	INFO scripts.py:1121 -- 2/3 stopped.2024-05-20 17:11:41,361	INFO scripts.py:1121 -- 3/3 stopped.2024-05-20 17:11:41,480	VINFO scripts.py:1094 -- Send termination request to `/storage/home/hcoda1/3/ctang306/.conda/envs/mjrl-env/lib/python3.7/site-packages/ray/core/src/ray/gcs/gcs_server --log_dir=/scratch/137032/ray/session_2024-05-20_17-10-36_343898_162460/logs --config_list=eyJvYmplY3Rfc3BpbGxpbmdfY29uZmlnIjogIntcInR5cGVcIjogXCJmaWxlc3lzdGVtXCIsIFwicGFyYW1zXCI6IHtcImRpcmVjdG9yeV9wYXRoXCI6IFwiL3NjcmF0Y2gvMTM3MDMyL3JheS9zZXNzaW9uXzIwMjQtMDUtMjBfMTctMTAtMzZfMzQzODk4XzE2MjQ2MFwifX0iLCAiaXNfZXh0ZXJuYWxfc3RvcmFnZV90eXBlX2ZzIjogdHJ1ZX0= --gcs_server_port=6379 --metrics-agent-port=59568 --node-ip-address=172.27.145.19 --session-name=session_2024-05-20_17-10-36_343898_162460` (via SIGTERM)
+2024-05-20 17:11:41,773	INFO scripts.py:1121 -- 1/1 stopped.2024-05-20 17:11:41,773	SUCC scripts.py:1166 -- Stopped all 5 Ray processes.
+---------------------------------------
+Begin Slurm Epilog: May-20-2024 17:11:42
+Job ID:        137032
+Array Job ID:  _4294967294
+User ID:       ctang306
+Account:       gts-hravichandar3-starlab
+Job name:      ARS_slurm
+Resources:     cpu=1,mem=64G,node=1
+Rsrc Used:     cput=00:01:16,vmem=3079756K,walltime=00:01:16,mem=3024584K,energy_used=0
+Partition:     cpu-large
+QOS:           inferno
+Nodes:         atl1-1-02-004-2-1
+---------------------------------------
