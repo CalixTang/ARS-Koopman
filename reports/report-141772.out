@@ -1,0 +1,38 @@
+---------------------------------------
+Begin Slurm Prolog: May-20-2024 22:47:49
+Job ID:    141772
+User ID:   ctang306
+Account:   gts-hravichandar3-starlab
+Job name:  ARS_slurm
+Partition: cpu-large
+QOS:       inferno
+---------------------------------------
+2024-05-20 22:47:51,860	INFO usage_lib.py:417 -- Usage stats collection is enabled by default without user confirmation because this terminal is detected to be non-interactive. To disable this, add `--disable-usage-stats` to the command that starts the cluster, or run the following command: `ray disable-usage-stats` before starting the cluster. See https://docs.ray.io/en/master/cluster/usage-stats.html for more details.
+2024-05-20 22:47:51,861	INFO scripts.py:744 -- Local node IP: 172.27.149.0
+2024-05-20 22:47:55,622	SUCC scripts.py:781 -- --------------------
+2024-05-20 22:47:55,622	SUCC scripts.py:782 -- Ray runtime started.
+2024-05-20 22:47:55,622	SUCC scripts.py:783 -- --------------------
+2024-05-20 22:47:55,622	INFO scripts.py:785 -- Next steps
+2024-05-20 22:47:55,623	INFO scripts.py:788 -- To add another node to this Ray cluster, run
+2024-05-20 22:47:55,623	INFO scripts.py:796 --   ray start --address='172.27.149.0:6379'
+2024-05-20 22:47:55,623	INFO scripts.py:800 -- To connect to this Ray cluster:
+2024-05-20 22:47:55,623	INFO scripts.py:802 -- import ray
+2024-05-20 22:47:55,623	INFO scripts.py:810 -- ray.init()
+2024-05-20 22:47:55,623	INFO scripts.py:834 -- To terminate the Ray runtime, run
+2024-05-20 22:47:55,623	INFO scripts.py:835 --   ray stop
+2024-05-20 22:47:55,623	INFO scripts.py:838 -- To view the status of the cluster, use
+2024-05-20 22:47:55,623	INFO scripts.py:839 --   ray status
+2024-05-20 22:48:00,686	INFO worker.py:1458 -- Connecting to existing Ray cluster at address: 172.27.149.0:6379...
+2024-05-20 22:48:00,700	INFO worker.py:1642 -- Connected to Ray cluster.
+Making dir data/1716259697111849926
+ARS parameters: {'task_id': 'relocate', 'n_iter': 300, 'n_directions': 16, 'deltas_used': 8, 'step_size': 0.05, 'delta_std': 0.02, 'n_workers': 1, 'rollout_length': 500, 'shift': 0, 'seed': 420, 'policy_type': 'relocate', 'dir_path': 'data', 'filter': 'NoFilter', 'object': 'ball', 'robot_dim': 30, 'obj_dim': 12}
+Policy parameters: {'type': 'relocate', 'ob_filter': 'NoFilter', 'ob_dim': 42, 'ac_dim': 0, 'robot_dim': 30, 'obj_dim': 12, 'object': 'ball', 'PID_controller': <mjrl.KODex_utils.Controller.PID object at 0x2aab41b7b690>}
+Initialize ARSLearner object
+[32;1mLogging data to data/1716259697111849926/log.txt[0m
+relocate-v0
+Creating deltas table.
+Created deltas table.
+Initializing workers.
+Initialized workers.
+Initialization of ARS complete.
+Starting training
