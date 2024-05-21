@@ -1,0 +1,2205 @@
+Making dir data/1716271909625925255
+ARS parameters: {'task_id': 'relocate', 'n_iter': 300, 'n_directions': 20, 'deltas_used': 10, 'step_size': 0.05, 'delta_std': 0.02, 'n_workers': 1, 'rollout_length': 500, 'shift': 0, 'seed': 123, 'policy_type': 'relocate', 'dir_path': 'data', 'filter': 'MeanStdFilter', 'object': 'ball', 'robot_dim': 30, 'obj_dim': 12}
+Policy parameters: {'type': 'relocate', 'ob_filter': 'MeanStdFilter', 'ob_dim': 42, 'ac_dim': 0, 'robot_dim': 30, 'obj_dim': 12, 'object': 'ball', 'PID_controller': <mjrl.KODex_utils.Controller.PID object at 0x7fb13318c750>}
+Initialize ARSLearner object
+[32;1mLogging data to data/1716271909625925255/log.txt[0m
+relocate-v0
+Creating deltas table.
+Created deltas table.
+Initializing workers.
+Initialized workers.
+Initialization of ARS complete.
+Starting training
+[2m[36m(Worker pid=216451)[0m relocate-v0
+[2m[36m(Worker pid=216451)[0m Worker initialized
+Mean reward of collected rollouts: -10.876988232323328
+Maximum reward of collected rollouts: -10.254654740475688
+Time to generate rollouts: 8.075493812561035
+time to aggregate rollouts 0.03304338455200195
+Euclidean norm of update step: 478.8721243567317
+Time to sync statistics: 0.008853912353515625
+Mean reward of collected rollouts: -24.678883825905753
+Maximum reward of collected rollouts: 12.709613949631835
+Time to generate rollouts: 6.901191473007202
+time to aggregate rollouts 0.012359619140625
+Euclidean norm of update step: 417.29359271233307
+Time to sync statistics: 0.05436873435974121
+Mean reward of collected rollouts: -24.21952328177134
+Maximum reward of collected rollouts: 23.045238750308627
+Time to generate rollouts: 6.806029796600342
+time to aggregate rollouts 0.012499809265136719
+Euclidean norm of update step: 350.5649334183707
+Time to sync statistics: 0.04544830322265625
+Mean reward of collected rollouts: -23.536903779254565
+Maximum reward of collected rollouts: 20.83793892368342
+Time to generate rollouts: 6.693394422531128
+time to aggregate rollouts 0.012317419052124023
+Euclidean norm of update step: 406.4207945736374
+Time to sync statistics: 0.010576009750366211
+Mean reward of collected rollouts: -23.292260683706132
+Maximum reward of collected rollouts: 34.293703463293795
+Time to generate rollouts: 6.7447590827941895
+time to aggregate rollouts 0.01232147216796875
+Euclidean norm of update step: 416.12393872326413
+Time to sync statistics: 0.004840373992919922
+Mean reward of collected rollouts: -24.57286578561064
+Maximum reward of collected rollouts: 53.27482840577708
+Time to generate rollouts: 6.695983171463013
+time to aggregate rollouts 0.015357732772827148
+Euclidean norm of update step: 395.26890984524476
+Time to sync statistics: 0.00583648681640625
+Mean reward of collected rollouts: -36.9008847115327
+Maximum reward of collected rollouts: 37.77413026005441
+Time to generate rollouts: 6.790972471237183
+time to aggregate rollouts 0.016715288162231445
+Euclidean norm of update step: 386.41201767947746
+Time to sync statistics: 0.0077707767486572266
+Mean reward of collected rollouts: -25.83002180949841
+Maximum reward of collected rollouts: 58.953245902003005
+Time to generate rollouts: 6.656691074371338
+time to aggregate rollouts 0.011628389358520508
+Euclidean norm of update step: 372.43269834300156
+Time to sync statistics: 0.045090675354003906
+Mean reward of collected rollouts: -15.15191166237388
+Maximum reward of collected rollouts: 110.51366902330571
+Time to generate rollouts: 6.725630283355713
+time to aggregate rollouts 0.01864004135131836
+Euclidean norm of update step: 389.7664531389278
+Time to sync statistics: 0.040778160095214844
+Mean reward of collected rollouts: -27.746224051491243
+Maximum reward of collected rollouts: 64.9602431755945
+Time to generate rollouts: 6.658752202987671
+time to aggregate rollouts 0.015311002731323242
+Euclidean norm of update step: 405.7504053301902
+It 9
+Mean reward of collected rollouts: 46.87691529860379
+Maximum reward of collected rollouts: 710.6122085745528
+Time to generate rollouts: 16.26103115081787
+--------------------------------------
+|             Time |            85.5 |
+|        Iteration |              10 |
+|    AverageReward |            46.9 |
+|       StdRewards |            96.4 |
+| MaxRewardRollout |             711 |
+| MinRewardRollout |           -7.61 |
+|        timesteps |           2e+05 |
+--------------------------------------
+Time to sync statistics: 0.0038824081420898438
+Mean reward of collected rollouts: -19.91904330939563
+Maximum reward of collected rollouts: 38.57287496162862
+Time to generate rollouts: 6.965325355529785
+time to aggregate rollouts 0.012786865234375
+Euclidean norm of update step: 359.0260843292427
+Time to sync statistics: 0.020697593688964844
+Mean reward of collected rollouts: -15.856304921584718
+Maximum reward of collected rollouts: 49.70391227218005
+Time to generate rollouts: 6.934331655502319
+time to aggregate rollouts 0.013849973678588867
+Euclidean norm of update step: 435.51349252649095
+Time to sync statistics: 0.02948141098022461
+Mean reward of collected rollouts: -49.48592320881431
+Maximum reward of collected rollouts: 33.41270725938518
+Time to generate rollouts: 6.9270853996276855
+time to aggregate rollouts 0.012880325317382812
+Euclidean norm of update step: 396.79344541261986
+Time to sync statistics: 0.04007124900817871
+Mean reward of collected rollouts: -28.92587597453784
+Maximum reward of collected rollouts: 34.959486464937015
+Time to generate rollouts: 6.8598854541778564
+time to aggregate rollouts 0.01308298110961914
+Euclidean norm of update step: 428.330403466979
+Time to sync statistics: 0.00894308090209961
+Mean reward of collected rollouts: -22.06806459288226
+Maximum reward of collected rollouts: 25.3481888905235
+Time to generate rollouts: 6.941781759262085
+time to aggregate rollouts 0.012537002563476562
+Euclidean norm of update step: 384.62850766784317
+Time to sync statistics: 0.02758646011352539
+Mean reward of collected rollouts: -36.01293998300539
+Maximum reward of collected rollouts: 54.276381031737934
+Time to generate rollouts: 6.893301486968994
+time to aggregate rollouts 0.012953519821166992
+Euclidean norm of update step: 379.83600423556976
+Time to sync statistics: 0.029036760330200195
+Mean reward of collected rollouts: -23.57091809267944
+Maximum reward of collected rollouts: 33.61940828858177
+Time to generate rollouts: 6.975241422653198
+time to aggregate rollouts 0.01275491714477539
+Euclidean norm of update step: 370.34386786979655
+Time to sync statistics: 0.027623653411865234
+Mean reward of collected rollouts: -18.039012462961097
+Maximum reward of collected rollouts: 27.458051025171223
+Time to generate rollouts: 6.8527185916900635
+time to aggregate rollouts 0.02003192901611328
+Euclidean norm of update step: 410.1547927904509
+Time to sync statistics: 0.0036673545837402344
+Mean reward of collected rollouts: -27.570861264332144
+Maximum reward of collected rollouts: 18.80538277909107
+Time to generate rollouts: 6.920124292373657
+time to aggregate rollouts 0.016889333724975586
+Euclidean norm of update step: 413.3400030622256
+Time to sync statistics: 0.05032515525817871
+Mean reward of collected rollouts: -14.986827777107754
+Maximum reward of collected rollouts: 115.78099867554987
+Time to generate rollouts: 7.004260301589966
+time to aggregate rollouts 0.019194841384887695
+Euclidean norm of update step: 380.6326257402846
+It 19
+Mean reward of collected rollouts: -24.029704966293394
+Maximum reward of collected rollouts: -24.029704966293384
+Time to generate rollouts: 17.44391441345215
+--------------------------------------
+|             Time |             173 |
+|        Iteration |              20 |
+|    AverageReward |             -24 |
+|       StdRewards |        1.07e-14 |
+| MaxRewardRollout |             -24 |
+| MinRewardRollout |             -24 |
+|        timesteps |           4e+05 |
+--------------------------------------
+Time to sync statistics: 0.0033731460571289062
+Mean reward of collected rollouts: -11.889128576132787
+Maximum reward of collected rollouts: 55.54848706715211
+Time to generate rollouts: 7.040359258651733
+time to aggregate rollouts 0.03954648971557617
+Euclidean norm of update step: 428.07120559242196
+Time to sync statistics: 0.005074977874755859
+Mean reward of collected rollouts: -15.52591138770786
+Maximum reward of collected rollouts: 121.77206271398737
+Time to generate rollouts: 7.102216720581055
+time to aggregate rollouts 0.012550592422485352
+Euclidean norm of update step: 379.10681912579213
+Time to sync statistics: 0.007043123245239258
+Mean reward of collected rollouts: -25.790244074728417
+Maximum reward of collected rollouts: 25.88950291759023
+Time to generate rollouts: 7.039952039718628
+time to aggregate rollouts 0.012896060943603516
+Euclidean norm of update step: 422.28505753665144
+Time to sync statistics: 0.008196830749511719
+Mean reward of collected rollouts: -22.35546420488655
+Maximum reward of collected rollouts: 23.065638208841513
+Time to generate rollouts: 6.960364103317261
+time to aggregate rollouts 0.012629508972167969
+Euclidean norm of update step: 395.2921567978999
+Time to sync statistics: 0.007856130599975586
+Mean reward of collected rollouts: -21.52206635619733
+Maximum reward of collected rollouts: 81.18028230568184
+Time to generate rollouts: 6.901700973510742
+time to aggregate rollouts 0.013351678848266602
+Euclidean norm of update step: 395.42647098127105
+Time to sync statistics: 0.003766775131225586
+Mean reward of collected rollouts: -25.728137690230483
+Maximum reward of collected rollouts: 34.999406898154504
+Time to generate rollouts: 7.019780874252319
+time to aggregate rollouts 0.012526512145996094
+Euclidean norm of update step: 412.6146507829307
+Time to sync statistics: 0.008455514907836914
+Mean reward of collected rollouts: -19.917135972534346
+Maximum reward of collected rollouts: 88.55550011101947
+Time to generate rollouts: 7.0459887981414795
+time to aggregate rollouts 0.012695789337158203
+Euclidean norm of update step: 381.6005460231173
+Time to sync statistics: 0.006838560104370117
+Mean reward of collected rollouts: -32.75460045554006
+Maximum reward of collected rollouts: 38.92738256704741
+Time to generate rollouts: 6.892823696136475
+time to aggregate rollouts 0.011502265930175781
+Euclidean norm of update step: 395.7203145477099
+Time to sync statistics: 0.0038208961486816406
+Mean reward of collected rollouts: -20.79733096660463
+Maximum reward of collected rollouts: 35.10047125734598
+Time to generate rollouts: 6.869232654571533
+time to aggregate rollouts 0.012768268585205078
+Euclidean norm of update step: 396.36770401602126
+Time to sync statistics: 0.006673097610473633
+Mean reward of collected rollouts: -25.168846514200204
+Maximum reward of collected rollouts: 44.52365115335133
+Time to generate rollouts: 6.880693197250366
+time to aggregate rollouts 0.013030767440795898
+Euclidean norm of update step: 364.79420727872
+It 29
+Mean reward of collected rollouts: -23.0225197176499
+Maximum reward of collected rollouts: -23.022519717649896
+Time to generate rollouts: 16.757983922958374
+--------------------------------------
+|             Time |             260 |
+|        Iteration |              30 |
+|    AverageReward |             -23 |
+|       StdRewards |        3.55e-15 |
+| MaxRewardRollout |             -23 |
+| MinRewardRollout |             -23 |
+|        timesteps |           6e+05 |
+--------------------------------------
+Time to sync statistics: 0.00505828857421875
+Mean reward of collected rollouts: -17.952103427660433
+Maximum reward of collected rollouts: 43.52106009211772
+Time to generate rollouts: 6.9521918296813965
+time to aggregate rollouts 0.012384176254272461
+Euclidean norm of update step: 384.75478254844506
+Time to sync statistics: 0.05859971046447754
+Mean reward of collected rollouts: -29.30269864405502
+Maximum reward of collected rollouts: 49.274468327520204
+Time to generate rollouts: 7.0607311725616455
+time to aggregate rollouts 0.012262821197509766
+Euclidean norm of update step: 263.31056965507815
+Time to sync statistics: 0.02234673500061035
+Mean reward of collected rollouts: -21.22679036669998
+Maximum reward of collected rollouts: 37.052916728612786
+Time to generate rollouts: 7.1877195835113525
+time to aggregate rollouts 0.012826919555664062
+Euclidean norm of update step: 408.4198178077055
+Time to sync statistics: 0.024095535278320312
+Mean reward of collected rollouts: -21.822803776783644
+Maximum reward of collected rollouts: 44.30573453509683
+Time to generate rollouts: 6.923412561416626
+time to aggregate rollouts 0.018445968627929688
+Euclidean norm of update step: 429.8699537641706
+Time to sync statistics: 0.022430896759033203
+Mean reward of collected rollouts: -23.591637231981746
+Maximum reward of collected rollouts: 35.48413361659701
+Time to generate rollouts: 6.967171669006348
+time to aggregate rollouts 0.01296854019165039
+Euclidean norm of update step: 368.8981470402715
+Time to sync statistics: 0.009332656860351562
+Mean reward of collected rollouts: -16.209667957843415
+Maximum reward of collected rollouts: 79.92809258775998
+Time to generate rollouts: 7.060325622558594
+time to aggregate rollouts 0.012491464614868164
+Euclidean norm of update step: 382.72556987709305
+Time to sync statistics: 0.0038568973541259766
+Mean reward of collected rollouts: -19.982656470566823
+Maximum reward of collected rollouts: 57.29380152557494
+Time to generate rollouts: 6.939719915390015
+time to aggregate rollouts 0.019518375396728516
+Euclidean norm of update step: 335.8023366665892
+Time to sync statistics: 0.0036182403564453125
+Mean reward of collected rollouts: -21.948936245114687
+Maximum reward of collected rollouts: 17.69023748137696
+Time to generate rollouts: 6.889400959014893
+time to aggregate rollouts 0.014928102493286133
+Euclidean norm of update step: 405.42365675835475
+Time to sync statistics: 0.011597156524658203
+Mean reward of collected rollouts: -12.824409375090497
+Maximum reward of collected rollouts: 106.88510649596924
+Time to generate rollouts: 6.980190753936768
+time to aggregate rollouts 0.011689424514770508
+Euclidean norm of update step: 403.8102121843678
+Time to sync statistics: 0.04751849174499512
+Mean reward of collected rollouts: -22.30497801060779
+Maximum reward of collected rollouts: 47.433043428285565
+Time to generate rollouts: 6.911286354064941
+time to aggregate rollouts 0.019417762756347656
+Euclidean norm of update step: 347.5906684479191
+It 39
+Mean reward of collected rollouts: -14.856621822815061
+Maximum reward of collected rollouts: -14.856621822815063
+Time to generate rollouts: 16.56036615371704
+--------------------------------------
+|             Time |             346 |
+|        Iteration |              40 |
+|    AverageReward |           -14.9 |
+|       StdRewards |        1.78e-15 |
+| MaxRewardRollout |           -14.9 |
+| MinRewardRollout |           -14.9 |
+|        timesteps |           8e+05 |
+--------------------------------------
+Time to sync statistics: 0.0032722949981689453
+Mean reward of collected rollouts: -17.094424819252612
+Maximum reward of collected rollouts: 48.713438613438704
+Time to generate rollouts: 6.9013352394104
+time to aggregate rollouts 0.01208353042602539
+Euclidean norm of update step: 373.69463642748656
+Time to sync statistics: 0.003442525863647461
+Mean reward of collected rollouts: -13.879288207827319
+Maximum reward of collected rollouts: 49.87858676023333
+Time to generate rollouts: 6.920959234237671
+time to aggregate rollouts 0.02066946029663086
+Euclidean norm of update step: 394.8663898197857
+Time to sync statistics: 0.0063495635986328125
+Mean reward of collected rollouts: -10.886267362158055
+Maximum reward of collected rollouts: 108.75156954401433
+Time to generate rollouts: 7.013476133346558
+time to aggregate rollouts 0.018754243850708008
+Euclidean norm of update step: 356.642216954467
+Time to sync statistics: 0.005863189697265625
+Mean reward of collected rollouts: -7.999826155160979
+Maximum reward of collected rollouts: 96.17747330450044
+Time to generate rollouts: 7.244540691375732
+time to aggregate rollouts 0.014794111251831055
+Euclidean norm of update step: 379.3047165841694
+Time to sync statistics: 0.004143238067626953
+Mean reward of collected rollouts: -10.351138585312361
+Maximum reward of collected rollouts: 92.60915044740729
+Time to generate rollouts: 6.955643177032471
+time to aggregate rollouts 0.011853218078613281
+Euclidean norm of update step: 333.9409329853207
+Time to sync statistics: 0.04656267166137695
+Mean reward of collected rollouts: -7.093570009872776
+Maximum reward of collected rollouts: 61.214590162171916
+Time to generate rollouts: 6.896451234817505
+time to aggregate rollouts 0.01866888999938965
+Euclidean norm of update step: 427.26193087649983
+Time to sync statistics: 0.044591665267944336
+Mean reward of collected rollouts: -21.04864985205548
+Maximum reward of collected rollouts: 72.60590363336424
+Time to generate rollouts: 6.942296743392944
+time to aggregate rollouts 0.012829780578613281
+Euclidean norm of update step: 369.84941357538105
+Time to sync statistics: 0.04431891441345215
+Mean reward of collected rollouts: -19.230301982401375
+Maximum reward of collected rollouts: 65.00152409361814
+Time to generate rollouts: 6.880468368530273
+time to aggregate rollouts 0.01227569580078125
+Euclidean norm of update step: 386.8600314871286
+Time to sync statistics: 0.0037810802459716797
+Mean reward of collected rollouts: -16.566977605070512
+Maximum reward of collected rollouts: 44.60150416255558
+Time to generate rollouts: 6.8746631145477295
+time to aggregate rollouts 0.01275014877319336
+Euclidean norm of update step: 450.88522688566354
+Time to sync statistics: 0.008475780487060547
+Mean reward of collected rollouts: -9.487974671279748
+Maximum reward of collected rollouts: 50.56575416514699
+Time to generate rollouts: 6.970304489135742
+time to aggregate rollouts 0.012538671493530273
+Euclidean norm of update step: 454.9524896440869
+It 49
+Mean reward of collected rollouts: -20.53236409595078
+Maximum reward of collected rollouts: -20.532364095950783
+Time to generate rollouts: 16.658101797103882
+--------------------------------------
+|             Time |             433 |
+|        Iteration |              50 |
+|    AverageReward |           -20.5 |
+|       StdRewards |        3.55e-15 |
+| MaxRewardRollout |           -20.5 |
+| MinRewardRollout |           -20.5 |
+|        timesteps |           1e+06 |
+--------------------------------------
+Time to sync statistics: 0.008483171463012695
+Mean reward of collected rollouts: -21.4631768254424
+Maximum reward of collected rollouts: 34.81699032130037
+Time to generate rollouts: 7.025602579116821
+time to aggregate rollouts 0.01260519027709961
+Euclidean norm of update step: 427.41310764254257
+Time to sync statistics: 0.0402984619140625
+Mean reward of collected rollouts: -14.743574010101625
+Maximum reward of collected rollouts: 57.86151996407164
+Time to generate rollouts: 6.839736461639404
+time to aggregate rollouts 0.011621952056884766
+Euclidean norm of update step: 370.76951495093033
+Time to sync statistics: 0.04801654815673828
+Mean reward of collected rollouts: -13.2771367049204
+Maximum reward of collected rollouts: 61.494534049988836
+Time to generate rollouts: 6.928297758102417
+time to aggregate rollouts 0.013092756271362305
+Euclidean norm of update step: 434.11045333877337
+Time to sync statistics: 0.04626655578613281
+Mean reward of collected rollouts: -19.55459173490908
+Maximum reward of collected rollouts: 61.3050735517898
+Time to generate rollouts: 6.930784702301025
+time to aggregate rollouts 0.011893272399902344
+Euclidean norm of update step: 358.0665604760075
+Time to sync statistics: 0.026635408401489258
+Mean reward of collected rollouts: -15.006666594236629
+Maximum reward of collected rollouts: 62.635300425230106
+Time to generate rollouts: 6.998854398727417
+time to aggregate rollouts 0.012654781341552734
+Euclidean norm of update step: 444.9544446479922
+Time to sync statistics: 0.003676176071166992
+Mean reward of collected rollouts: -18.664079252986276
+Maximum reward of collected rollouts: 51.01944336464278
+Time to generate rollouts: 7.059868097305298
+time to aggregate rollouts 0.012531757354736328
+Euclidean norm of update step: 374.00402807438815
+Time to sync statistics: 0.024181842803955078
+Mean reward of collected rollouts: -32.76294893464988
+Maximum reward of collected rollouts: 37.12777281186203
+Time to generate rollouts: 6.920055389404297
+time to aggregate rollouts 0.011926412582397461
+Euclidean norm of update step: 345.61014536283324
+Time to sync statistics: 0.029113292694091797
+Mean reward of collected rollouts: -7.360386806401232
+Maximum reward of collected rollouts: 295.94503266095506
+Time to generate rollouts: 6.86612868309021
+time to aggregate rollouts 0.012785911560058594
+Euclidean norm of update step: 385.6438685441326
+Time to sync statistics: 0.032634735107421875
+Mean reward of collected rollouts: -19.52926881385708
+Maximum reward of collected rollouts: 56.508431515180334
+Time to generate rollouts: 6.887312173843384
+time to aggregate rollouts 0.012377738952636719
+Euclidean norm of update step: 444.4200389717101
+Time to sync statistics: 0.04552268981933594
+Mean reward of collected rollouts: -14.439542764678254
+Maximum reward of collected rollouts: 52.84876978316223
+Time to generate rollouts: 6.8171210289001465
+time to aggregate rollouts 0.018592357635498047
+Euclidean norm of update step: 416.8064098339315
+It 59
+Mean reward of collected rollouts: 0.7500930609212871
+Maximum reward of collected rollouts: 7.700876042358639
+Time to generate rollouts: 16.012738704681396
+--------------------------------------
+|             Time |             519 |
+|        Iteration |              60 |
+|    AverageReward |            0.75 |
+|       StdRewards |            2.99 |
+| MaxRewardRollout |             7.7 |
+| MinRewardRollout |           -6.39 |
+|        timesteps |         1.2e+06 |
+--------------------------------------
+Time to sync statistics: 0.003246307373046875
+Mean reward of collected rollouts: -21.5264186985867
+Maximum reward of collected rollouts: 28.61120345940155
+Time to generate rollouts: 6.856378793716431
+time to aggregate rollouts 0.012393951416015625
+Euclidean norm of update step: 340.53648597457453
+Time to sync statistics: 0.008069276809692383
+Mean reward of collected rollouts: -18.872043708304737
+Maximum reward of collected rollouts: 45.14902843159563
+Time to generate rollouts: 6.899933099746704
+time to aggregate rollouts 0.012936830520629883
+Euclidean norm of update step: 396.08866289687484
+Time to sync statistics: 0.032920122146606445
+Mean reward of collected rollouts: -20.47638079260672
+Maximum reward of collected rollouts: 201.8737871004602
+Time to generate rollouts: 6.811729431152344
+time to aggregate rollouts 0.012596607208251953
+Euclidean norm of update step: 329.46307350967345
+Time to sync statistics: 0.08157110214233398
+Mean reward of collected rollouts: -17.73272790040121
+Maximum reward of collected rollouts: 49.131214227849874
+Time to generate rollouts: 6.82270073890686
+time to aggregate rollouts 0.012713432312011719
+Euclidean norm of update step: 362.25273507796504
+Time to sync statistics: 0.041841745376586914
+Mean reward of collected rollouts: -28.03515395870743
+Maximum reward of collected rollouts: 77.36926975645042
+Time to generate rollouts: 6.922035455703735
+time to aggregate rollouts 0.011788606643676758
+Euclidean norm of update step: 375.28974862011273
+Time to sync statistics: 0.04664158821105957
+Mean reward of collected rollouts: -28.01943785384451
+Maximum reward of collected rollouts: 10.340261702900866
+Time to generate rollouts: 6.844786882400513
+time to aggregate rollouts 0.012247562408447266
+Euclidean norm of update step: 351.9288478214859
+Time to sync statistics: 0.05228757858276367
+Mean reward of collected rollouts: -24.953817838578185
+Maximum reward of collected rollouts: 317.50759901227207
+Time to generate rollouts: 6.809186220169067
+time to aggregate rollouts 0.012826919555664062
+Euclidean norm of update step: 342.0081215700801
+Time to sync statistics: 0.025138139724731445
+Mean reward of collected rollouts: -18.831815293123245
+Maximum reward of collected rollouts: 37.879982780061226
+Time to generate rollouts: 7.080346345901489
+time to aggregate rollouts 0.012490987777709961
+Euclidean norm of update step: 373.004309750677
+Time to sync statistics: 0.003536224365234375
+Mean reward of collected rollouts: -21.145305479214777
+Maximum reward of collected rollouts: 31.415350462359616
+Time to generate rollouts: 6.844475030899048
+time to aggregate rollouts 0.012245416641235352
+Euclidean norm of update step: 402.1424230113318
+Time to sync statistics: 0.01655411720275879
+Mean reward of collected rollouts: -17.78239754824453
+Maximum reward of collected rollouts: 53.387436223957955
+Time to generate rollouts: 6.85143518447876
+time to aggregate rollouts 0.012634515762329102
+Euclidean norm of update step: 390.39723568291157
+It 69
+Mean reward of collected rollouts: -25.843747064322493
+Maximum reward of collected rollouts: -25.84374706432249
+Time to generate rollouts: 16.072261810302734
+--------------------------------------
+|             Time |             604 |
+|        Iteration |              70 |
+|    AverageReward |           -25.8 |
+|       StdRewards |        3.55e-15 |
+| MaxRewardRollout |           -25.8 |
+| MinRewardRollout |           -25.8 |
+|        timesteps |         1.4e+06 |
+--------------------------------------
+Time to sync statistics: 0.0027832984924316406
+Mean reward of collected rollouts: -19.8236919243515
+Maximum reward of collected rollouts: 74.02956046460868
+Time to generate rollouts: 6.84620213508606
+time to aggregate rollouts 0.012553691864013672
+Euclidean norm of update step: 301.9685901689749
+Time to sync statistics: 0.007017374038696289
+Mean reward of collected rollouts: -17.985484658220468
+Maximum reward of collected rollouts: 63.87186650411089
+Time to generate rollouts: 6.851996183395386
+time to aggregate rollouts 0.011685848236083984
+Euclidean norm of update step: 403.69905754270326
+Time to sync statistics: 0.0452876091003418
+Mean reward of collected rollouts: -24.296880190703696
+Maximum reward of collected rollouts: 43.84482821705662
+Time to generate rollouts: 6.950372934341431
+time to aggregate rollouts 0.01748180389404297
+Euclidean norm of update step: 341.0189526193243
+Time to sync statistics: 0.04251837730407715
+Mean reward of collected rollouts: -15.013742996530084
+Maximum reward of collected rollouts: 70.87230135484397
+Time to generate rollouts: 6.917694568634033
+time to aggregate rollouts 0.012251138687133789
+Euclidean norm of update step: 409.34331234765324
+Time to sync statistics: 0.04558444023132324
+Mean reward of collected rollouts: -5.020290676392623
+Maximum reward of collected rollouts: 134.4630086145073
+Time to generate rollouts: 6.851024627685547
+time to aggregate rollouts 0.01257634162902832
+Euclidean norm of update step: 434.0093004227763
+Time to sync statistics: 0.020859956741333008
+Mean reward of collected rollouts: -15.699055504597078
+Maximum reward of collected rollouts: 42.329796913872684
+Time to generate rollouts: 6.836713790893555
+time to aggregate rollouts 0.011918306350708008
+Euclidean norm of update step: 438.27363122501487
+Time to sync statistics: 0.04643130302429199
+Mean reward of collected rollouts: -17.302418351037705
+Maximum reward of collected rollouts: 70.80194623930727
+Time to generate rollouts: 6.882419586181641
+time to aggregate rollouts 0.013067960739135742
+Euclidean norm of update step: 454.3918213920812
+Time to sync statistics: 0.07196760177612305
+Mean reward of collected rollouts: -15.853612086337062
+Maximum reward of collected rollouts: 56.79923755406664
+Time to generate rollouts: 6.972574472427368
+time to aggregate rollouts 0.01232004165649414
+Euclidean norm of update step: 452.95408679526633
+Time to sync statistics: 0.009151697158813477
+Mean reward of collected rollouts: -15.708330346102395
+Maximum reward of collected rollouts: 65.80237287037177
+Time to generate rollouts: 7.120894908905029
+time to aggregate rollouts 0.012921333312988281
+Euclidean norm of update step: 409.2467245028499
+Time to sync statistics: 0.007999658584594727
+Mean reward of collected rollouts: 10.83080081963207
+Maximum reward of collected rollouts: 599.0207350154348
+Time to generate rollouts: 7.033958673477173
+time to aggregate rollouts 0.011671304702758789
+Euclidean norm of update step: 345.03452032426037
+It 79
+Mean reward of collected rollouts: -24.84066827352176
+Maximum reward of collected rollouts: -24.840668273521757
+Time to generate rollouts: 16.22340750694275
+--------------------------------------
+|             Time |             690 |
+|        Iteration |              80 |
+|    AverageReward |           -24.8 |
+|       StdRewards |        3.55e-15 |
+| MaxRewardRollout |           -24.8 |
+| MinRewardRollout |           -24.8 |
+|        timesteps |         1.6e+06 |
+--------------------------------------
+Time to sync statistics: 0.0030260086059570312
+Mean reward of collected rollouts: -10.979971885250901
+Maximum reward of collected rollouts: 96.0697010766199
+Time to generate rollouts: 6.904570817947388
+time to aggregate rollouts 0.011703014373779297
+Euclidean norm of update step: 417.39227409702863
+Time to sync statistics: 0.04596757888793945
+Mean reward of collected rollouts: -11.307057873811758
+Maximum reward of collected rollouts: 59.18566102662511
+Time to generate rollouts: 6.917073726654053
+time to aggregate rollouts 0.01789569854736328
+Euclidean norm of update step: 398.9554335705879
+Time to sync statistics: 0.04359292984008789
+Mean reward of collected rollouts: -11.85753236022343
+Maximum reward of collected rollouts: 30.077184888309976
+Time to generate rollouts: 6.819528102874756
+time to aggregate rollouts 0.01148676872253418
+Euclidean norm of update step: 411.65893309712555
+Time to sync statistics: 0.003967761993408203
+Mean reward of collected rollouts: -22.41960597133983
+Maximum reward of collected rollouts: 37.82540027378213
+Time to generate rollouts: 6.734269380569458
+time to aggregate rollouts 0.018813133239746094
+Euclidean norm of update step: 420.30944685599985
+Time to sync statistics: 0.003545522689819336
+Mean reward of collected rollouts: -20.13634744642919
+Maximum reward of collected rollouts: 98.51357103225027
+Time to generate rollouts: 6.975310325622559
+time to aggregate rollouts 0.012352705001831055
+Euclidean norm of update step: 341.7536590317804
+Time to sync statistics: 0.003402233123779297
+Mean reward of collected rollouts: -20.569776497653713
+Maximum reward of collected rollouts: 20.139789432635915
+Time to generate rollouts: 6.873086452484131
+time to aggregate rollouts 0.012254953384399414
+Euclidean norm of update step: 395.157603297967
+Time to sync statistics: 0.003775358200073242
+Mean reward of collected rollouts: -19.04733479215684
+Maximum reward of collected rollouts: 45.35821367711535
+Time to generate rollouts: 6.76811146736145
+time to aggregate rollouts 0.01244974136352539
+Euclidean norm of update step: 390.47791764142454
+Time to sync statistics: 0.00481104850769043
+Mean reward of collected rollouts: -23.835162913927917
+Maximum reward of collected rollouts: 71.64980185350137
+Time to generate rollouts: 6.926742076873779
+time to aggregate rollouts 0.013748884201049805
+Euclidean norm of update step: 300.5171669055278
+Time to sync statistics: 0.008158445358276367
+Mean reward of collected rollouts: -9.459764037755287
+Maximum reward of collected rollouts: 108.7807723693162
+Time to generate rollouts: 6.9781763553619385
+time to aggregate rollouts 0.012336254119873047
+Euclidean norm of update step: 357.9361490180398
+Time to sync statistics: 0.023952007293701172
+Mean reward of collected rollouts: -10.809455351806202
+Maximum reward of collected rollouts: 53.9195809532943
+Time to generate rollouts: 6.986826181411743
+time to aggregate rollouts 0.012942075729370117
+Euclidean norm of update step: 466.4070226119258
+It 89
+Mean reward of collected rollouts: -49.95117639922961
+Maximum reward of collected rollouts: -40.857405544474084
+Time to generate rollouts: 16.481760263442993
+--------------------------------------
+|             Time |             776 |
+|        Iteration |              90 |
+|    AverageReward |             -50 |
+|       StdRewards |            5.16 |
+| MaxRewardRollout |           -40.9 |
+| MinRewardRollout |           -61.2 |
+|        timesteps |         1.8e+06 |
+--------------------------------------
+Time to sync statistics: 0.0032079219818115234
+Mean reward of collected rollouts: -9.74974527507724
+Maximum reward of collected rollouts: 54.53733175725338
+Time to generate rollouts: 6.93569278717041
+time to aggregate rollouts 0.012112855911254883
+Euclidean norm of update step: 423.6393994350781
+Time to sync statistics: 0.024860858917236328
+Mean reward of collected rollouts: -17.70207463621228
+Maximum reward of collected rollouts: 55.72073933760147
+Time to generate rollouts: 6.912169456481934
+time to aggregate rollouts 0.012715339660644531
+Euclidean norm of update step: 396.75288883257525
+Time to sync statistics: 0.023347139358520508
+Mean reward of collected rollouts: -19.099109416429645
+Maximum reward of collected rollouts: 38.15829174726784
+Time to generate rollouts: 6.906174421310425
+time to aggregate rollouts 0.013699054718017578
+Euclidean norm of update step: 342.9462253194118
+Time to sync statistics: 0.00753331184387207
+Mean reward of collected rollouts: -15.49231823259998
+Maximum reward of collected rollouts: 40.581458076124974
+Time to generate rollouts: 6.857226848602295
+time to aggregate rollouts 0.012169361114501953
+Euclidean norm of update step: 434.8574949243525
+Time to sync statistics: 0.005564689636230469
+Mean reward of collected rollouts: -4.964720244849939
+Maximum reward of collected rollouts: 99.29013428329809
+Time to generate rollouts: 6.906863451004028
+time to aggregate rollouts 0.013911962509155273
+Euclidean norm of update step: 373.66238656735646
+Time to sync statistics: 0.007398366928100586
+Mean reward of collected rollouts: -18.25389516517757
+Maximum reward of collected rollouts: 61.560893166293354
+Time to generate rollouts: 6.784491062164307
+time to aggregate rollouts 0.012434959411621094
+Euclidean norm of update step: 353.15615301098467
+Time to sync statistics: 0.004984140396118164
+Mean reward of collected rollouts: -5.469864594801679
+Maximum reward of collected rollouts: 190.9311412505969
+Time to generate rollouts: 6.97542929649353
+time to aggregate rollouts 0.012334346771240234
+Euclidean norm of update step: 313.8137354346398
+Time to sync statistics: 0.045864105224609375
+Mean reward of collected rollouts: -10.658772441884341
+Maximum reward of collected rollouts: 61.39515640190142
+Time to generate rollouts: 6.854615926742554
+time to aggregate rollouts 0.012709617614746094
+Euclidean norm of update step: 440.0031584809734
+Time to sync statistics: 0.003618478775024414
+Mean reward of collected rollouts: -13.780885646819826
+Maximum reward of collected rollouts: 63.55320570884681
+Time to generate rollouts: 6.816301107406616
+time to aggregate rollouts 0.012047052383422852
+Euclidean norm of update step: 403.75647892877004
+Time to sync statistics: 0.026459693908691406
+Mean reward of collected rollouts: -19.837260195148506
+Maximum reward of collected rollouts: 41.695236698542566
+Time to generate rollouts: 6.864567995071411
+time to aggregate rollouts 0.012550830841064453
+Euclidean norm of update step: 404.60208295437536
+It 99
+Mean reward of collected rollouts: 45.38971057511728
+Maximum reward of collected rollouts: 63.97217590334054
+Time to generate rollouts: 16.981945514678955
+--------------------------------------
+|             Time |             862 |
+|        Iteration |             100 |
+|    AverageReward |            45.4 |
+|       StdRewards |            12.8 |
+| MaxRewardRollout |              64 |
+| MinRewardRollout |            11.9 |
+|        timesteps |           2e+06 |
+--------------------------------------
+Time to sync statistics: 0.0036232471466064453
+Mean reward of collected rollouts: -10.356327478619946
+Maximum reward of collected rollouts: 57.75477140075904
+Time to generate rollouts: 6.768671751022339
+time to aggregate rollouts 0.012375354766845703
+Euclidean norm of update step: 429.09719517921064
+Time to sync statistics: 0.00915837287902832
+Mean reward of collected rollouts: -15.63446442917255
+Maximum reward of collected rollouts: 57.76705107107243
+Time to generate rollouts: 6.893287897109985
+time to aggregate rollouts 0.012117624282836914
+Euclidean norm of update step: 447.1154973908823
+Time to sync statistics: 0.0037384033203125
+Mean reward of collected rollouts: -20.41365934164832
+Maximum reward of collected rollouts: 49.909458187112406
+Time to generate rollouts: 6.956173419952393
+time to aggregate rollouts 0.012170553207397461
+Euclidean norm of update step: 396.60194451610494
+Time to sync statistics: 0.00832676887512207
+Mean reward of collected rollouts: -46.10702445466654
+Maximum reward of collected rollouts: 34.517191329615756
+Time to generate rollouts: 6.82988166809082
+time to aggregate rollouts 0.019129037857055664
+Euclidean norm of update step: 371.61051771299594
+Time to sync statistics: 0.03776121139526367
+Mean reward of collected rollouts: -2.453243437761558
+Maximum reward of collected rollouts: 193.27200986691656
+Time to generate rollouts: 7.126081228256226
+time to aggregate rollouts 0.01208806037902832
+Euclidean norm of update step: 390.2779114465095
+Time to sync statistics: 0.034874916076660156
+Mean reward of collected rollouts: -21.281672147068292
+Maximum reward of collected rollouts: 19.64065887318385
+Time to generate rollouts: 6.907381534576416
+time to aggregate rollouts 0.011866569519042969
+Euclidean norm of update step: 381.12248211759317
+Time to sync statistics: 0.003992557525634766
+Mean reward of collected rollouts: -23.285628730722852
+Maximum reward of collected rollouts: 74.02446652209915
+Time to generate rollouts: 6.874311447143555
+time to aggregate rollouts 0.018580198287963867
+Euclidean norm of update step: 419.90382733723675
+Time to sync statistics: 0.07028937339782715
+Mean reward of collected rollouts: -7.609420740676214
+Maximum reward of collected rollouts: 623.8196039578943
+Time to generate rollouts: 6.758038282394409
+time to aggregate rollouts 0.01228475570678711
+Euclidean norm of update step: 355.6364246538049
+Time to sync statistics: 0.026382923126220703
+Mean reward of collected rollouts: -28.16800117545925
+Maximum reward of collected rollouts: 28.32849216873818
+Time to generate rollouts: 6.762267589569092
+time to aggregate rollouts 0.011674642562866211
+Euclidean norm of update step: 342.439083651458
+Time to sync statistics: 0.008690118789672852
+Mean reward of collected rollouts: -13.950401206370879
+Maximum reward of collected rollouts: 41.72833790320705
+Time to generate rollouts: 6.920643091201782
+time to aggregate rollouts 0.011363744735717773
+Euclidean norm of update step: 425.62078223180697
+It 109
+Mean reward of collected rollouts: -98.86402896833376
+Maximum reward of collected rollouts: -40.03232219940405
+Time to generate rollouts: 16.246354579925537
+--------------------------------------
+|             Time |             948 |
+|        Iteration |             110 |
+|    AverageReward |           -98.9 |
+|       StdRewards |            10.1 |
+| MaxRewardRollout |             -40 |
+| MinRewardRollout |            -120 |
+|        timesteps |         2.2e+06 |
+--------------------------------------
+Time to sync statistics: 0.0037844181060791016
+Mean reward of collected rollouts: -21.06415820226845
+Maximum reward of collected rollouts: 33.80880680898993
+Time to generate rollouts: 6.855648756027222
+time to aggregate rollouts 0.014189720153808594
+Euclidean norm of update step: 375.5219564858211
+Time to sync statistics: 0.022748708724975586
+Mean reward of collected rollouts: -13.812368859333043
+Maximum reward of collected rollouts: 56.288597392600465
+Time to generate rollouts: 7.129914999008179
+time to aggregate rollouts 0.011900663375854492
+Euclidean norm of update step: 350.33746631185676
+Time to sync statistics: 0.023963451385498047
+Mean reward of collected rollouts: -20.14416714157402
+Maximum reward of collected rollouts: 50.73583259629539
+Time to generate rollouts: 6.942222833633423
+time to aggregate rollouts 0.019060373306274414
+Euclidean norm of update step: 387.93662844524556
+Time to sync statistics: 0.0036237239837646484
+Mean reward of collected rollouts: -24.63419580049337
+Maximum reward of collected rollouts: 65.38093596283743
+Time to generate rollouts: 7.026283025741577
+time to aggregate rollouts 0.013023138046264648
+Euclidean norm of update step: 379.1986186321344
+Time to sync statistics: 0.012511491775512695
+Mean reward of collected rollouts: -21.258668988906265
+Maximum reward of collected rollouts: 187.3831628827133
+Time to generate rollouts: 6.806991338729858
+time to aggregate rollouts 0.01629185676574707
+Euclidean norm of update step: 365.2156229739899
+Time to sync statistics: 0.004528045654296875
+Mean reward of collected rollouts: -32.36559139532345
+Maximum reward of collected rollouts: 36.33920861048644
+Time to generate rollouts: 6.777451992034912
+time to aggregate rollouts 0.014690399169921875
+Euclidean norm of update step: 356.4236677486304
+Time to sync statistics: 0.007973909378051758
+Mean reward of collected rollouts: -31.043091218141985
+Maximum reward of collected rollouts: 46.4110251127997
+Time to generate rollouts: 6.9315712451934814
+time to aggregate rollouts 0.012573003768920898
+Euclidean norm of update step: 425.91293402941517
+Time to sync statistics: 0.008991003036499023
+Mean reward of collected rollouts: -54.225962551864235
+Maximum reward of collected rollouts: 46.843622140923
+Time to generate rollouts: 7.066221475601196
+time to aggregate rollouts 0.0130157470703125
+Euclidean norm of update step: 424.1557367490757
+Time to sync statistics: 0.05599355697631836
+Mean reward of collected rollouts: -18.298328181139375
+Maximum reward of collected rollouts: 80.00856820765665
+Time to generate rollouts: 6.843044757843018
+time to aggregate rollouts 0.011502742767333984
+Euclidean norm of update step: 381.1076769957546
+Time to sync statistics: 0.0089111328125
+Mean reward of collected rollouts: -14.21064420186607
+Maximum reward of collected rollouts: 53.663874678805755
+Time to generate rollouts: 6.773170471191406
+time to aggregate rollouts 0.011787176132202148
+Euclidean norm of update step: 452.0287484548308
+It 119
+Mean reward of collected rollouts: -22.414445983484633
+Maximum reward of collected rollouts: -22.414445983484633
+Time to generate rollouts: 16.137532472610474
+--------------------------------------
+|             Time |        1.03e+03 |
+|        Iteration |             120 |
+|    AverageReward |           -22.4 |
+|       StdRewards |               0 |
+| MaxRewardRollout |           -22.4 |
+| MinRewardRollout |           -22.4 |
+|        timesteps |         2.4e+06 |
+--------------------------------------
+Time to sync statistics: 0.003488779067993164
+Mean reward of collected rollouts: -14.862710881657401
+Maximum reward of collected rollouts: 123.80968520021428
+Time to generate rollouts: 6.848323106765747
+time to aggregate rollouts 0.015837669372558594
+Euclidean norm of update step: 339.7889715384923
+Time to sync statistics: 0.007135152816772461
+Mean reward of collected rollouts: -21.846426749073704
+Maximum reward of collected rollouts: 96.3084263360815
+Time to generate rollouts: 6.8810954093933105
+time to aggregate rollouts 0.011460065841674805
+Euclidean norm of update step: 396.1424542574573
+Time to sync statistics: 0.050382375717163086
+Mean reward of collected rollouts: -20.3026054510069
+Maximum reward of collected rollouts: 31.706731876576963
+Time to generate rollouts: 6.869943618774414
+time to aggregate rollouts 0.01217508316040039
+Euclidean norm of update step: 400.16976982533635
+Time to sync statistics: 0.023844480514526367
+Mean reward of collected rollouts: -33.50739771299858
+Maximum reward of collected rollouts: 57.12251673889628
+Time to generate rollouts: 7.026341199874878
+time to aggregate rollouts 0.012262344360351562
+Euclidean norm of update step: 406.88667339008134
+Time to sync statistics: 0.04721546173095703
+Mean reward of collected rollouts: -22.31447957566484
+Maximum reward of collected rollouts: 28.439957784257327
+Time to generate rollouts: 6.847771883010864
+time to aggregate rollouts 0.011907815933227539
+Euclidean norm of update step: 365.0250736183951
+Time to sync statistics: 0.05164217948913574
+Mean reward of collected rollouts: -20.45954542069906
+Maximum reward of collected rollouts: 29.844089221841415
+Time to generate rollouts: 6.775918483734131
+time to aggregate rollouts 0.01708364486694336
+Euclidean norm of update step: 414.005245118596
+Time to sync statistics: 0.04146909713745117
+Mean reward of collected rollouts: -16.696372500004813
+Maximum reward of collected rollouts: 58.63374913380947
+Time to generate rollouts: 7.018568754196167
+time to aggregate rollouts 0.015585899353027344
+Euclidean norm of update step: 395.6038378543118
+Time to sync statistics: 0.003937959671020508
+Mean reward of collected rollouts: -15.242037137066532
+Maximum reward of collected rollouts: 230.37759730217186
+Time to generate rollouts: 6.927633047103882
+time to aggregate rollouts 0.0124359130859375
+Euclidean norm of update step: 357.7076559964636
+Time to sync statistics: 0.03584623336791992
+Mean reward of collected rollouts: -17.029172744743924
+Maximum reward of collected rollouts: 51.182879824580084
+Time to generate rollouts: 6.909543514251709
+time to aggregate rollouts 0.013996601104736328
+Euclidean norm of update step: 401.5053175895302
+Time to sync statistics: 0.021663427352905273
+Mean reward of collected rollouts: -16.95133528760463
+Maximum reward of collected rollouts: 69.76792683407902
+Time to generate rollouts: 6.783206224441528
+time to aggregate rollouts 0.011724472045898438
+Euclidean norm of update step: 383.4875443492274
+It 129
+Mean reward of collected rollouts: -24.42332060425681
+Maximum reward of collected rollouts: -24.42332060425681
+Time to generate rollouts: 16.287824153900146
+--------------------------------------
+|             Time |        1.12e+03 |
+|        Iteration |             130 |
+|    AverageReward |           -24.4 |
+|       StdRewards |               0 |
+| MaxRewardRollout |           -24.4 |
+| MinRewardRollout |           -24.4 |
+|        timesteps |         2.6e+06 |
+--------------------------------------
+Time to sync statistics: 0.004123687744140625
+Mean reward of collected rollouts: -21.29114732568191
+Maximum reward of collected rollouts: 55.763912886559055
+Time to generate rollouts: 6.896702289581299
+time to aggregate rollouts 0.012300491333007812
+Euclidean norm of update step: 388.11166540888553
+Time to sync statistics: 0.008924007415771484
+Mean reward of collected rollouts: -10.309270214001213
+Maximum reward of collected rollouts: 50.24371027908846
+Time to generate rollouts: 6.788892984390259
+time to aggregate rollouts 0.0186917781829834
+Euclidean norm of update step: 444.1403312431581
+Time to sync statistics: 0.0315098762512207
+Mean reward of collected rollouts: -17.201529117782872
+Maximum reward of collected rollouts: 113.98702353356593
+Time to generate rollouts: 6.962374925613403
+time to aggregate rollouts 0.018969058990478516
+Euclidean norm of update step: 352.22037623894084
+Time to sync statistics: 0.037550926208496094
+Mean reward of collected rollouts: -9.071935242709255
+Maximum reward of collected rollouts: 63.25485317140267
+Time to generate rollouts: 7.074888467788696
+time to aggregate rollouts 0.012973546981811523
+Euclidean norm of update step: 326.80314637700735
+Time to sync statistics: 0.010257720947265625
+Mean reward of collected rollouts: -25.339236647567862
+Maximum reward of collected rollouts: 51.65468867583602
+Time to generate rollouts: 7.0173046588897705
+time to aggregate rollouts 0.01270914077758789
+Euclidean norm of update step: 374.6243142980547
+Time to sync statistics: 0.03208661079406738
+Mean reward of collected rollouts: -6.336778997388797
+Maximum reward of collected rollouts: 230.52497081573495
+Time to generate rollouts: 7.118202209472656
+time to aggregate rollouts 0.01243901252746582
+Euclidean norm of update step: 374.3558863618868
+Time to sync statistics: 0.03880190849304199
+Mean reward of collected rollouts: 1.768868074798266
+Maximum reward of collected rollouts: 363.9782706855678
+Time to generate rollouts: 6.915916919708252
+time to aggregate rollouts 0.011936187744140625
+Euclidean norm of update step: 382.07636608961616
+Time to sync statistics: 0.007523059844970703
+Mean reward of collected rollouts: -15.014556152957056
+Maximum reward of collected rollouts: 47.83247518178128
+Time to generate rollouts: 6.882477283477783
+time to aggregate rollouts 0.01836538314819336
+Euclidean norm of update step: 407.4721062169522
+Time to sync statistics: 0.004866838455200195
+Mean reward of collected rollouts: 1.8744124179338464
+Maximum reward of collected rollouts: 369.06206380118965
+Time to generate rollouts: 6.955877780914307
+time to aggregate rollouts 0.011942148208618164
+Euclidean norm of update step: 385.4072297558777
+Time to sync statistics: 0.04570794105529785
+Mean reward of collected rollouts: -12.353596944630729
+Maximum reward of collected rollouts: 54.052714467723874
+Time to generate rollouts: 6.8262341022491455
+time to aggregate rollouts 0.014285564422607422
+Euclidean norm of update step: 291.99656053781564
+It 139
+Mean reward of collected rollouts: 2.903721507408261
+Maximum reward of collected rollouts: 10.645013047127623
+Time to generate rollouts: 16.304757833480835
+--------------------------------------
+|             Time |        1.21e+03 |
+|        Iteration |             140 |
+|    AverageReward |             2.9 |
+|       StdRewards |            3.24 |
+| MaxRewardRollout |            10.6 |
+| MinRewardRollout |           -3.93 |
+|        timesteps |         2.8e+06 |
+--------------------------------------
+Time to sync statistics: 0.0036537647247314453
+Mean reward of collected rollouts: -8.402099571929579
+Maximum reward of collected rollouts: 54.23851247650521
+Time to generate rollouts: 6.898101806640625
+time to aggregate rollouts 0.016688823699951172
+Euclidean norm of update step: 412.57641459503446
+Time to sync statistics: 0.04107999801635742
+Mean reward of collected rollouts: -4.852279296013704
+Maximum reward of collected rollouts: 148.87502323515298
+Time to generate rollouts: 6.790780782699585
+time to aggregate rollouts 0.011857032775878906
+Euclidean norm of update step: 376.90127373038723
+Time to sync statistics: 0.005745410919189453
+Mean reward of collected rollouts: 18.52688190714615
+Maximum reward of collected rollouts: 1453.2353712011918
+Time to generate rollouts: 6.956833362579346
+time to aggregate rollouts 0.012160062789916992
+Euclidean norm of update step: 346.92888889046077
+Time to sync statistics: 0.008821964263916016
+Mean reward of collected rollouts: -5.6223637847450005
+Maximum reward of collected rollouts: 82.59851407613276
+Time to generate rollouts: 6.928283929824829
+time to aggregate rollouts 0.011677980422973633
+Euclidean norm of update step: 410.65953434648566
+Time to sync statistics: 0.008183717727661133
+Mean reward of collected rollouts: -8.770036254336173
+Maximum reward of collected rollouts: 154.0444968338079
+Time to generate rollouts: 7.217037200927734
+time to aggregate rollouts 0.07622480392456055
+Euclidean norm of update step: 337.734528628484
+Time to sync statistics: 0.043587684631347656
+Mean reward of collected rollouts: -10.96120365773975
+Maximum reward of collected rollouts: 66.83229293671958
+Time to generate rollouts: 7.194640398025513
+time to aggregate rollouts 0.018116474151611328
+Euclidean norm of update step: 326.0430525429779
+Time to sync statistics: 0.046636104583740234
+Mean reward of collected rollouts: 6.956502148461387
+Maximum reward of collected rollouts: 428.4101928563517
+Time to generate rollouts: 7.096897125244141
+time to aggregate rollouts 0.01192164421081543
+Euclidean norm of update step: 372.2820805734898
+Time to sync statistics: 0.0542600154876709
+Mean reward of collected rollouts: -2.2055087450532587
+Maximum reward of collected rollouts: 72.59201768597713
+Time to generate rollouts: 7.081171035766602
+time to aggregate rollouts 0.011290550231933594
+Euclidean norm of update step: 382.52700218195383
+Time to sync statistics: 0.024320125579833984
+Mean reward of collected rollouts: -9.61774686898033
+Maximum reward of collected rollouts: 67.25734273641292
+Time to generate rollouts: 6.901817321777344
+time to aggregate rollouts 0.012276411056518555
+Euclidean norm of update step: 411.61808763928667
+Time to sync statistics: 0.05390024185180664
+Mean reward of collected rollouts: -22.276612580782416
+Maximum reward of collected rollouts: 56.568713596454224
+Time to generate rollouts: 6.904690265655518
+time to aggregate rollouts 0.011803627014160156
+Euclidean norm of update step: 396.0455953213907
+It 149
+Mean reward of collected rollouts: -18.389953103351626
+Maximum reward of collected rollouts: -18.389953103351626
+Time to generate rollouts: 16.21948218345642
+--------------------------------------
+|             Time |        1.29e+03 |
+|        Iteration |             150 |
+|    AverageReward |           -18.4 |
+|       StdRewards |               0 |
+| MaxRewardRollout |           -18.4 |
+| MinRewardRollout |           -18.4 |
+|        timesteps |           3e+06 |
+--------------------------------------
+Time to sync statistics: 0.004513978958129883
+Mean reward of collected rollouts: -5.250207181388416
+Maximum reward of collected rollouts: 114.53467414581185
+Time to generate rollouts: 6.9983069896698
+time to aggregate rollouts 0.01147150993347168
+Euclidean norm of update step: 383.46159100666983
+Time to sync statistics: 0.008144855499267578
+Mean reward of collected rollouts: 2.399896753950325
+Maximum reward of collected rollouts: 267.3604943906352
+Time to generate rollouts: 6.925324201583862
+time to aggregate rollouts 0.01570582389831543
+Euclidean norm of update step: 388.5987291480611
+Time to sync statistics: 0.007915258407592773
+Mean reward of collected rollouts: -11.473364901315152
+Maximum reward of collected rollouts: 93.89514696379757
+Time to generate rollouts: 6.898989200592041
+time to aggregate rollouts 0.018135786056518555
+Euclidean norm of update step: 395.68433042928683
+Time to sync statistics: 0.022073030471801758
+Mean reward of collected rollouts: -11.933156202730396
+Maximum reward of collected rollouts: 159.11035511401374
+Time to generate rollouts: 6.833832740783691
+time to aggregate rollouts 0.015979290008544922
+Euclidean norm of update step: 412.5832327343801
+Time to sync statistics: 0.0095977783203125
+Mean reward of collected rollouts: -26.83701736755226
+Maximum reward of collected rollouts: 43.432804304340266
+Time to generate rollouts: 6.9209983348846436
+time to aggregate rollouts 0.012000083923339844
+Euclidean norm of update step: 439.05038830928754
+Time to sync statistics: 0.02171778678894043
+Mean reward of collected rollouts: -20.78166277920802
+Maximum reward of collected rollouts: 280.9252569020707
+Time to generate rollouts: 7.07399320602417
+time to aggregate rollouts 0.01203155517578125
+Euclidean norm of update step: 374.48494022180427
+Time to sync statistics: 0.04072141647338867
+Mean reward of collected rollouts: -13.91296536276773
+Maximum reward of collected rollouts: 77.72194895962609
+Time to generate rollouts: 6.781230211257935
+time to aggregate rollouts 0.011495351791381836
+Euclidean norm of update step: 466.388850408955
+Time to sync statistics: 0.04881691932678223
+Mean reward of collected rollouts: -8.683158677460474
+Maximum reward of collected rollouts: 200.97706000528538
+Time to generate rollouts: 7.1184985637664795
+time to aggregate rollouts 0.011845588684082031
+Euclidean norm of update step: 348.35312053723
+Time to sync statistics: 0.009684324264526367
+Mean reward of collected rollouts: -26.58688227218484
+Maximum reward of collected rollouts: 56.583940366319425
+Time to generate rollouts: 7.176769256591797
+time to aggregate rollouts 0.01201319694519043
+Euclidean norm of update step: 368.83288802831527
+Time to sync statistics: 0.03283071517944336
+Mean reward of collected rollouts: -12.627113976184827
+Maximum reward of collected rollouts: 81.46280725061933
+Time to generate rollouts: 6.928548336029053
+time to aggregate rollouts 0.012074470520019531
+Euclidean norm of update step: 442.8553066513852
+It 159
+Mean reward of collected rollouts: 34.848194561874145
+Maximum reward of collected rollouts: 161.76472061829878
+Time to generate rollouts: 16.030366897583008
+--------------------------------------
+|             Time |        1.38e+03 |
+|        Iteration |             160 |
+|    AverageReward |            34.8 |
+|       StdRewards |              24 |
+| MaxRewardRollout |             162 |
+| MinRewardRollout |           -2.84 |
+|        timesteps |         3.2e+06 |
+--------------------------------------
+Time to sync statistics: 0.0030727386474609375
+Mean reward of collected rollouts: -4.200867150223457
+Maximum reward of collected rollouts: 317.3763232205607
+Time to generate rollouts: 6.890803575515747
+time to aggregate rollouts 0.017995357513427734
+Euclidean norm of update step: 383.43012528868206
+Time to sync statistics: 0.00800180435180664
+Mean reward of collected rollouts: -12.09750153465578
+Maximum reward of collected rollouts: 75.90483606131093
+Time to generate rollouts: 6.8950817584991455
+time to aggregate rollouts 0.01199650764465332
+Euclidean norm of update step: 391.8506491335338
+Time to sync statistics: 0.022945165634155273
+Mean reward of collected rollouts: -21.979094240351067
+Maximum reward of collected rollouts: 227.16337763887753
+Time to generate rollouts: 6.791973352432251
+time to aggregate rollouts 0.011743307113647461
+Euclidean norm of update step: 458.69046021529715
+Time to sync statistics: 0.009597301483154297
+Mean reward of collected rollouts: -24.268805047617395
+Maximum reward of collected rollouts: 73.8036147154352
+Time to generate rollouts: 6.790074110031128
+time to aggregate rollouts 0.0169219970703125
+Euclidean norm of update step: 324.91510435644284
+Time to sync statistics: 0.038225650787353516
+Mean reward of collected rollouts: 0.22239990413778657
+Maximum reward of collected rollouts: 252.11762308084366
+Time to generate rollouts: 6.945382833480835
+time to aggregate rollouts 0.012243986129760742
+Euclidean norm of update step: 321.2516967242945
+Time to sync statistics: 0.040703535079956055
+Mean reward of collected rollouts: -25.57274887654455
+Maximum reward of collected rollouts: 37.51496830317559
+Time to generate rollouts: 6.8838324546813965
+time to aggregate rollouts 0.011569976806640625
+Euclidean norm of update step: 398.16012630998176
+Time to sync statistics: 0.04430103302001953
+Mean reward of collected rollouts: -27.86489490401045
+Maximum reward of collected rollouts: 57.79706694732932
+Time to generate rollouts: 6.859168767929077
+time to aggregate rollouts 0.011800289154052734
+Euclidean norm of update step: 447.34810768387604
+Time to sync statistics: 0.004408121109008789
+Mean reward of collected rollouts: -6.203247255182493
+Maximum reward of collected rollouts: 198.97499158068197
+Time to generate rollouts: 7.056844711303711
+time to aggregate rollouts 0.011491537094116211
+Euclidean norm of update step: 343.97464391625164
+Time to sync statistics: 0.04608917236328125
+Mean reward of collected rollouts: -19.523570533535185
+Maximum reward of collected rollouts: 36.368821279826726
+Time to generate rollouts: 6.915820360183716
+time to aggregate rollouts 0.011787891387939453
+Euclidean norm of update step: 391.94995293482685
+Time to sync statistics: 0.039258718490600586
+Mean reward of collected rollouts: -17.394830319523933
+Maximum reward of collected rollouts: 106.1355415395914
+Time to generate rollouts: 6.900363206863403
+time to aggregate rollouts 0.019797563552856445
+Euclidean norm of update step: 357.2678595094019
+It 169
+Mean reward of collected rollouts: -25.040213223696334
+Maximum reward of collected rollouts: -25.04021322369633
+Time to generate rollouts: 17.20849871635437
+--------------------------------------
+|             Time |        1.46e+03 |
+|        Iteration |             170 |
+|    AverageReward |             -25 |
+|       StdRewards |        3.55e-15 |
+| MaxRewardRollout |             -25 |
+| MinRewardRollout |             -25 |
+|        timesteps |         3.4e+06 |
+--------------------------------------
+Time to sync statistics: 0.003253459930419922
+Mean reward of collected rollouts: -28.65815955739177
+Maximum reward of collected rollouts: 36.097908050545186
+Time to generate rollouts: 6.990159273147583
+time to aggregate rollouts 0.011435747146606445
+Euclidean norm of update step: 365.5820548556735
+Time to sync statistics: 0.006254434585571289
+Mean reward of collected rollouts: -5.210360251555306
+Maximum reward of collected rollouts: 138.6469253712746
+Time to generate rollouts: 6.896482706069946
+time to aggregate rollouts 0.012246131896972656
+Euclidean norm of update step: 459.69028344757163
+Time to sync statistics: 0.05619359016418457
+Mean reward of collected rollouts: -15.360890994870767
+Maximum reward of collected rollouts: 90.13567890520018
+Time to generate rollouts: 6.962059259414673
+time to aggregate rollouts 0.011223793029785156
+Euclidean norm of update step: 455.52335343654073
+Time to sync statistics: 0.003680706024169922
+Mean reward of collected rollouts: -19.51798688081064
+Maximum reward of collected rollouts: 174.22556208006506
+Time to generate rollouts: 6.917207956314087
+time to aggregate rollouts 0.011484861373901367
+Euclidean norm of update step: 363.924518580184
+Time to sync statistics: 0.00449824333190918
+Mean reward of collected rollouts: -15.46219251518526
+Maximum reward of collected rollouts: 92.6007444809172
+Time to generate rollouts: 6.847954750061035
+time to aggregate rollouts 0.011344194412231445
+Euclidean norm of update step: 396.2368816842927
+Time to sync statistics: 0.04453682899475098
+Mean reward of collected rollouts: -4.484551461679719
+Maximum reward of collected rollouts: 106.60336748070966
+Time to generate rollouts: 7.010458946228027
+time to aggregate rollouts 0.011874675750732422
+Euclidean norm of update step: 434.4096218557273
+Time to sync statistics: 0.008491754531860352
+Mean reward of collected rollouts: -22.179488497501445
+Maximum reward of collected rollouts: 29.267918834919858
+Time to generate rollouts: 6.947812557220459
+time to aggregate rollouts 0.01114344596862793
+Euclidean norm of update step: 359.2712931473706
+Time to sync statistics: 0.045981407165527344
+Mean reward of collected rollouts: -17.428383931605758
+Maximum reward of collected rollouts: 85.38021837430607
+Time to generate rollouts: 6.88111138343811
+time to aggregate rollouts 0.011190414428710938
+Euclidean norm of update step: 419.9796158958208
+Time to sync statistics: 0.04722285270690918
+Mean reward of collected rollouts: -23.824798985849494
+Maximum reward of collected rollouts: 47.04423677289245
+Time to generate rollouts: 6.866481304168701
+time to aggregate rollouts 0.011513710021972656
+Euclidean norm of update step: 433.8799915148696
+Time to sync statistics: 0.058548927307128906
+Mean reward of collected rollouts: -27.42055320616767
+Maximum reward of collected rollouts: 97.18208072447078
+Time to generate rollouts: 6.947408676147461
+time to aggregate rollouts 0.012037515640258789
+Euclidean norm of update step: 408.66174841545575
+It 179
+Mean reward of collected rollouts: -19.103612798732357
+Maximum reward of collected rollouts: -19.103612798732357
+Time to generate rollouts: 16.11343812942505
+--------------------------------------
+|             Time |        1.55e+03 |
+|        Iteration |             180 |
+|    AverageReward |           -19.1 |
+|       StdRewards |               0 |
+| MaxRewardRollout |           -19.1 |
+| MinRewardRollout |           -19.1 |
+|        timesteps |         3.6e+06 |
+--------------------------------------
+Time to sync statistics: 0.0032465457916259766
+Mean reward of collected rollouts: -3.9945699918426625
+Maximum reward of collected rollouts: 310.4549041626804
+Time to generate rollouts: 6.824649095535278
+time to aggregate rollouts 0.011926889419555664
+Euclidean norm of update step: 404.71876504441576
+Time to sync statistics: 0.028728961944580078
+Mean reward of collected rollouts: -11.443945346250146
+Maximum reward of collected rollouts: 53.63578474458581
+Time to generate rollouts: 6.8973777294158936
+time to aggregate rollouts 0.01177525520324707
+Euclidean norm of update step: 461.6067373515753
+Time to sync statistics: 0.04749035835266113
+Mean reward of collected rollouts: -1.9669712929007332
+Maximum reward of collected rollouts: 588.9239835421172
+Time to generate rollouts: 6.984306573867798
+time to aggregate rollouts 0.016871929168701172
+Euclidean norm of update step: 374.1094407011108
+Time to sync statistics: 0.037639617919921875
+Mean reward of collected rollouts: -12.080794799000328
+Maximum reward of collected rollouts: 103.97733713344553
+Time to generate rollouts: 6.895430088043213
+time to aggregate rollouts 0.011814594268798828
+Euclidean norm of update step: 393.1626650085588
+Time to sync statistics: 0.02595067024230957
+Mean reward of collected rollouts: -21.436418152149237
+Maximum reward of collected rollouts: 36.905880562572335
+Time to generate rollouts: 6.867762088775635
+time to aggregate rollouts 0.011658191680908203
+Euclidean norm of update step: 386.67604678413323
+Time to sync statistics: 0.02292656898498535
+Mean reward of collected rollouts: -20.08359820176266
+Maximum reward of collected rollouts: 46.03789625072997
+Time to generate rollouts: 6.824663162231445
+time to aggregate rollouts 0.011884927749633789
+Euclidean norm of update step: 417.61895745700554
+Time to sync statistics: 0.04504132270812988
+Mean reward of collected rollouts: -8.055363870318946
+Maximum reward of collected rollouts: 243.21786669921116
+Time to generate rollouts: 6.864943504333496
+time to aggregate rollouts 0.0167996883392334
+Euclidean norm of update step: 363.8132108502703
+Time to sync statistics: 0.051354408264160156
+Mean reward of collected rollouts: -31.51260894678892
+Maximum reward of collected rollouts: 43.86462806329673
+Time to generate rollouts: 7.109802484512329
+time to aggregate rollouts 0.011665105819702148
+Euclidean norm of update step: 345.14964148578775
+Time to sync statistics: 0.010481119155883789
+Mean reward of collected rollouts: -17.50997015438053
+Maximum reward of collected rollouts: 56.99277164327887
+Time to generate rollouts: 6.816323757171631
+time to aggregate rollouts 0.011225223541259766
+Euclidean norm of update step: 387.1372337054683
+Time to sync statistics: 0.046294212341308594
+Mean reward of collected rollouts: -19.224561130752623
+Maximum reward of collected rollouts: 39.76264213333193
+Time to generate rollouts: 6.845324277877808
+time to aggregate rollouts 0.011363744735717773
+Euclidean norm of update step: 382.88911199547624
+It 189
+Mean reward of collected rollouts: -10.864121946720013
+Maximum reward of collected rollouts: -5.847582317207053
+Time to generate rollouts: 16.29588794708252
+--------------------------------------
+|             Time |        1.64e+03 |
+|        Iteration |             190 |
+|    AverageReward |           -10.9 |
+|       StdRewards |            2.38 |
+| MaxRewardRollout |           -5.85 |
+| MinRewardRollout |           -15.1 |
+|        timesteps |         3.8e+06 |
+--------------------------------------
+Time to sync statistics: 0.004985332489013672
+Mean reward of collected rollouts: -14.795133850235397
+Maximum reward of collected rollouts: 130.49164279627115
+Time to generate rollouts: 6.881249904632568
+time to aggregate rollouts 0.011950492858886719
+Euclidean norm of update step: 378.07077361367925
+Time to sync statistics: 0.02801513671875
+Mean reward of collected rollouts: -22.11060021586355
+Maximum reward of collected rollouts: 13.898469855658766
+Time to generate rollouts: 7.024682283401489
+time to aggregate rollouts 0.01194620132446289
+Euclidean norm of update step: 343.691341400743
+Time to sync statistics: 0.04589343070983887
+Mean reward of collected rollouts: -20.041137086131062
+Maximum reward of collected rollouts: 55.94691082402216
+Time to generate rollouts: 6.936923980712891
+time to aggregate rollouts 0.012184381484985352
+Euclidean norm of update step: 412.4399772681929
+Time to sync statistics: 0.00850367546081543
+Mean reward of collected rollouts: -21.06616980985611
+Maximum reward of collected rollouts: 51.504169579688416
+Time to generate rollouts: 6.863473415374756
+time to aggregate rollouts 0.011620283126831055
+Euclidean norm of update step: 408.62844592519184
+Time to sync statistics: 0.02437877655029297
+Mean reward of collected rollouts: -17.23883536777044
+Maximum reward of collected rollouts: 58.47838680094279
+Time to generate rollouts: 6.840153455734253
+time to aggregate rollouts 0.014922380447387695
+Euclidean norm of update step: 426.8947520044792
+Time to sync statistics: 0.004500627517700195
+Mean reward of collected rollouts: -17.285027412259915
+Maximum reward of collected rollouts: 60.56233267532032
+Time to generate rollouts: 6.894433259963989
+time to aggregate rollouts 0.013753652572631836
+Euclidean norm of update step: 417.767388726116
+Time to sync statistics: 0.006170034408569336
+Mean reward of collected rollouts: -12.93919409776351
+Maximum reward of collected rollouts: 78.10718578407553
+Time to generate rollouts: 6.911000967025757
+time to aggregate rollouts 0.018331050872802734
+Euclidean norm of update step: 435.5632131824288
+Time to sync statistics: 0.009288311004638672
+Mean reward of collected rollouts: -15.526336006593095
+Maximum reward of collected rollouts: 73.3449513846112
+Time to generate rollouts: 6.913596153259277
+time to aggregate rollouts 0.01271820068359375
+Euclidean norm of update step: 437.52449863226053
+Time to sync statistics: 0.046488285064697266
+Mean reward of collected rollouts: -22.84376003219135
+Maximum reward of collected rollouts: 58.59412181309999
+Time to generate rollouts: 6.82067608833313
+time to aggregate rollouts 0.013056516647338867
+Euclidean norm of update step: 396.90434684719287
+Time to sync statistics: 0.04226374626159668
+Mean reward of collected rollouts: -16.534980192250565
+Maximum reward of collected rollouts: 63.08839084235619
+Time to generate rollouts: 6.894596815109253
+time to aggregate rollouts 0.01926279067993164
+Euclidean norm of update step: 388.72999143880656
+It 199
+Mean reward of collected rollouts: -29.185194439889855
+Maximum reward of collected rollouts: -29.185194439889845
+Time to generate rollouts: 16.165568351745605
+--------------------------------------
+|             Time |        1.72e+03 |
+|        Iteration |             200 |
+|    AverageReward |           -29.2 |
+|       StdRewards |        1.07e-14 |
+| MaxRewardRollout |           -29.2 |
+| MinRewardRollout |           -29.2 |
+|        timesteps |           4e+06 |
+--------------------------------------
+Time to sync statistics: 0.003457784652709961
+Mean reward of collected rollouts: -22.41466625978004
+Maximum reward of collected rollouts: 48.04067529489016
+Time to generate rollouts: 6.818712472915649
+time to aggregate rollouts 0.011771917343139648
+Euclidean norm of update step: 397.78935023524247
+Time to sync statistics: 0.042833566665649414
+Mean reward of collected rollouts: -8.492306993389839
+Maximum reward of collected rollouts: 106.25312538706532
+Time to generate rollouts: 6.8338494300842285
+time to aggregate rollouts 0.012776613235473633
+Euclidean norm of update step: 437.76148280983506
+Time to sync statistics: 0.0040171146392822266
+Mean reward of collected rollouts: -26.927615402456535
+Maximum reward of collected rollouts: 50.08583329250939
+Time to generate rollouts: 6.880521774291992
+time to aggregate rollouts 0.012242317199707031
+Euclidean norm of update step: 384.8775477463176
+Time to sync statistics: 0.007284641265869141
+Mean reward of collected rollouts: -16.981282568660163
+Maximum reward of collected rollouts: 53.92572033925255
+Time to generate rollouts: 7.097809314727783
+time to aggregate rollouts 0.012047767639160156
+Euclidean norm of update step: 423.16092168235065
+Time to sync statistics: 0.007712602615356445
+Mean reward of collected rollouts: -2.0229069713205816
+Maximum reward of collected rollouts: 251.06482689882884
+Time to generate rollouts: 7.083940505981445
+time to aggregate rollouts 0.011970281600952148
+Euclidean norm of update step: 389.1350384958515
+Time to sync statistics: 0.005413055419921875
+Mean reward of collected rollouts: -9.116088891573918
+Maximum reward of collected rollouts: 247.1991262178913
+Time to generate rollouts: 6.985733509063721
+time to aggregate rollouts 0.012262821197509766
+Euclidean norm of update step: 348.5309729263596
+Time to sync statistics: 0.006793498992919922
+Mean reward of collected rollouts: -14.827094564667174
+Maximum reward of collected rollouts: 38.29739593964635
+Time to generate rollouts: 7.067338466644287
+time to aggregate rollouts 0.011759042739868164
+Euclidean norm of update step: 396.4295737943664
+Time to sync statistics: 0.009038209915161133
+Mean reward of collected rollouts: -7.673112659884484
+Maximum reward of collected rollouts: 84.2961363800101
+Time to generate rollouts: 7.0119874477386475
+time to aggregate rollouts 0.012002706527709961
+Euclidean norm of update step: 369.20052893329614
+Time to sync statistics: 0.020281553268432617
+Mean reward of collected rollouts: -16.994250445547287
+Maximum reward of collected rollouts: 46.19850441730431
+Time to generate rollouts: 6.989621877670288
+time to aggregate rollouts 0.012099981307983398
+Euclidean norm of update step: 417.8153193826163
+Time to sync statistics: 0.008547067642211914
+Mean reward of collected rollouts: -12.37238371885679
+Maximum reward of collected rollouts: 42.54087213419756
+Time to generate rollouts: 6.988542795181274
+time to aggregate rollouts 0.018905162811279297
+Euclidean norm of update step: 422.7154982533199
+It 209
+Mean reward of collected rollouts: 21.32508937941584
+Maximum reward of collected rollouts: 25.671354303180532
+Time to generate rollouts: 16.568874835968018
+--------------------------------------
+|             Time |        1.81e+03 |
+|        Iteration |             210 |
+|    AverageReward |            21.3 |
+|       StdRewards |            2.63 |
+| MaxRewardRollout |            25.7 |
+| MinRewardRollout |            13.4 |
+|        timesteps |         4.2e+06 |
+--------------------------------------
+Time to sync statistics: 0.003620147705078125
+Mean reward of collected rollouts: -13.187631959061246
+Maximum reward of collected rollouts: 98.31873745531597
+Time to generate rollouts: 7.011770725250244
+time to aggregate rollouts 0.01223444938659668
+Euclidean norm of update step: 413.949576010952
+Time to sync statistics: 0.004319190979003906
+Mean reward of collected rollouts: -22.4879736530223
+Maximum reward of collected rollouts: 66.0066881375365
+Time to generate rollouts: 6.850133657455444
+time to aggregate rollouts 0.012397289276123047
+Euclidean norm of update step: 415.3456438523039
+Time to sync statistics: 0.05033421516418457
+Mean reward of collected rollouts: -6.310772837975583
+Maximum reward of collected rollouts: 221.49476102354305
+Time to generate rollouts: 6.859395980834961
+time to aggregate rollouts 0.012609720230102539
+Euclidean norm of update step: 342.98447657198955
+Time to sync statistics: 0.0085296630859375
+Mean reward of collected rollouts: -9.361642729393935
+Maximum reward of collected rollouts: 74.80535312456685
+Time to generate rollouts: 6.974248886108398
+time to aggregate rollouts 0.013923168182373047
+Euclidean norm of update step: 349.0288789512839
+Time to sync statistics: 0.007770538330078125
+Mean reward of collected rollouts: -13.979923494243971
+Maximum reward of collected rollouts: 96.45636208950349
+Time to generate rollouts: 7.157686233520508
+time to aggregate rollouts 0.01388096809387207
+Euclidean norm of update step: 412.32021427267136
+Time to sync statistics: 0.004274845123291016
+Mean reward of collected rollouts: -16.004835360133463
+Maximum reward of collected rollouts: 48.61509572178519
+Time to generate rollouts: 6.938865423202515
+time to aggregate rollouts 0.011585712432861328
+Euclidean norm of update step: 461.4861671498289
+Time to sync statistics: 0.004130840301513672
+Mean reward of collected rollouts: -34.849667083122625
+Maximum reward of collected rollouts: 57.91401485138112
+Time to generate rollouts: 6.833268642425537
+time to aggregate rollouts 0.012053728103637695
+Euclidean norm of update step: 384.91501896463296
+Time to sync statistics: 0.003713369369506836
+Mean reward of collected rollouts: -17.771675935488098
+Maximum reward of collected rollouts: 60.56953511117126
+Time to generate rollouts: 6.909109830856323
+time to aggregate rollouts 0.011647462844848633
+Euclidean norm of update step: 369.09047635315875
+Time to sync statistics: 0.0068318843841552734
+Mean reward of collected rollouts: -19.892088914856508
+Maximum reward of collected rollouts: 117.31605476080266
+Time to generate rollouts: 6.9417314529418945
+time to aggregate rollouts 0.012848138809204102
+Euclidean norm of update step: 391.9528078705477
+Time to sync statistics: 0.022565364837646484
+Mean reward of collected rollouts: -10.976645545337968
+Maximum reward of collected rollouts: 124.86111362760636
+Time to generate rollouts: 6.910293102264404
+time to aggregate rollouts 0.01184988021850586
+Euclidean norm of update step: 400.4311758384268
+It 219
+Mean reward of collected rollouts: 47.622769825176604
+Maximum reward of collected rollouts: 203.78422172785346
+Time to generate rollouts: 16.151877880096436
+--------------------------------------
+|             Time |        1.89e+03 |
+|        Iteration |             220 |
+|    AverageReward |            47.6 |
+|       StdRewards |            18.4 |
+| MaxRewardRollout |             204 |
+| MinRewardRollout |            26.8 |
+|        timesteps |         4.4e+06 |
+--------------------------------------
+Time to sync statistics: 0.0030231475830078125
+Mean reward of collected rollouts: -14.627758569846245
+Maximum reward of collected rollouts: 50.77603855753547
+Time to generate rollouts: 7.052196741104126
+time to aggregate rollouts 0.012093544006347656
+Euclidean norm of update step: 447.5840898409821
+Time to sync statistics: 0.07478642463684082
+Mean reward of collected rollouts: -11.993060534124101
+Maximum reward of collected rollouts: 54.282785781006226
+Time to generate rollouts: 6.948172569274902
+time to aggregate rollouts 0.011380195617675781
+Euclidean norm of update step: 353.43627109053864
+Time to sync statistics: 0.04793429374694824
+Mean reward of collected rollouts: -6.038223570097967
+Maximum reward of collected rollouts: 208.09299613063112
+Time to generate rollouts: 6.8690574169158936
+time to aggregate rollouts 0.012441873550415039
+Euclidean norm of update step: 387.79660452765785
+Time to sync statistics: 0.013238668441772461
+Mean reward of collected rollouts: -14.408597679953957
+Maximum reward of collected rollouts: 63.28137103244292
+Time to generate rollouts: 6.94430947303772
+time to aggregate rollouts 0.011850118637084961
+Euclidean norm of update step: 389.89816103633814
+Time to sync statistics: 0.04305410385131836
+Mean reward of collected rollouts: -24.23146038885053
+Maximum reward of collected rollouts: 331.5283542962628
+Time to generate rollouts: 6.927518129348755
+time to aggregate rollouts 0.011584997177124023
+Euclidean norm of update step: 465.8619784950365
+Time to sync statistics: 0.01822519302368164
+Mean reward of collected rollouts: -10.517423040180876
+Maximum reward of collected rollouts: 65.78514492456382
+Time to generate rollouts: 6.998015403747559
+time to aggregate rollouts 0.011876821517944336
+Euclidean norm of update step: 462.71550782735534
+Time to sync statistics: 0.029734134674072266
+Mean reward of collected rollouts: -9.442104899914522
+Maximum reward of collected rollouts: 78.81476226575055
+Time to generate rollouts: 6.999794244766235
+time to aggregate rollouts 0.01393580436706543
+Euclidean norm of update step: 428.648145568342
+Time to sync statistics: 0.00391840934753418
+Mean reward of collected rollouts: -9.000569143699293
+Maximum reward of collected rollouts: 110.20505425799459
+Time to generate rollouts: 6.999105215072632
+time to aggregate rollouts 0.01199197769165039
+Euclidean norm of update step: 444.2791123159745
+Time to sync statistics: 0.04922032356262207
+Mean reward of collected rollouts: 3.4095859274487736
+Maximum reward of collected rollouts: 98.95464770481688
+Time to generate rollouts: 6.904688358306885
+time to aggregate rollouts 0.011456012725830078
+Euclidean norm of update step: 445.81608217146703
+Time to sync statistics: 0.0459442138671875
+Mean reward of collected rollouts: 3.311034089854357
+Maximum reward of collected rollouts: 118.94018215816709
+Time to generate rollouts: 6.92514443397522
+time to aggregate rollouts 0.014158487319946289
+Euclidean norm of update step: 459.3675520528222
+It 229
+Mean reward of collected rollouts: -118.5310976327977
+Maximum reward of collected rollouts: 214.70935598091216
+Time to generate rollouts: 16.94350290298462
+--------------------------------------
+|             Time |        1.98e+03 |
+|        Iteration |             230 |
+|    AverageReward |            -119 |
+|       StdRewards |            70.8 |
+| MaxRewardRollout |             215 |
+| MinRewardRollout |            -204 |
+|        timesteps |         4.6e+06 |
+--------------------------------------
+Time to sync statistics: 0.0051457881927490234
+Mean reward of collected rollouts: -3.5802107356112103
+Maximum reward of collected rollouts: 109.25862039123798
+Time to generate rollouts: 6.9317467212677
+time to aggregate rollouts 0.011761903762817383
+Euclidean norm of update step: 388.08622885478457
+Time to sync statistics: 0.019510746002197266
+Mean reward of collected rollouts: -9.88784969116396
+Maximum reward of collected rollouts: 86.26518872855064
+Time to generate rollouts: 7.011108160018921
+time to aggregate rollouts 0.015645742416381836
+Euclidean norm of update step: 440.0101494756159
+Time to sync statistics: 0.012997150421142578
+Mean reward of collected rollouts: 6.991215400265429
+Maximum reward of collected rollouts: 215.03664080529603
+Time to generate rollouts: 6.88984751701355
+time to aggregate rollouts 0.011937141418457031
+Euclidean norm of update step: 417.75373233317794
+Time to sync statistics: 0.042992353439331055
+Mean reward of collected rollouts: 7.666497357488311
+Maximum reward of collected rollouts: 440.4372625662832
+Time to generate rollouts: 6.828875780105591
+time to aggregate rollouts 0.016865015029907227
+Euclidean norm of update step: 357.25604150541113
+Time to sync statistics: 0.044649362564086914
+Mean reward of collected rollouts: 8.039883966233953
+Maximum reward of collected rollouts: 94.68796994932957
+Time to generate rollouts: 6.978123903274536
+time to aggregate rollouts 0.011822938919067383
+Euclidean norm of update step: 406.37695372028287
+Time to sync statistics: 0.02444291114807129
+Mean reward of collected rollouts: -14.676074375747334
+Maximum reward of collected rollouts: 47.95973473991463
+Time to generate rollouts: 6.989418268203735
+time to aggregate rollouts 0.011494159698486328
+Euclidean norm of update step: 431.75446137895676
+Time to sync statistics: 0.006360530853271484
+Mean reward of collected rollouts: 4.352983036125655
+Maximum reward of collected rollouts: 115.99636186878986
+Time to generate rollouts: 7.124926567077637
+time to aggregate rollouts 0.012375116348266602
+Euclidean norm of update step: 413.16403583973556
+Time to sync statistics: 0.00814962387084961
+Mean reward of collected rollouts: -3.1045505376606153
+Maximum reward of collected rollouts: 109.3337418428807
+Time to generate rollouts: 7.125659942626953
+time to aggregate rollouts 0.018996715545654297
+Euclidean norm of update step: 360.5831673259622
+Time to sync statistics: 0.003570079803466797
+Mean reward of collected rollouts: -31.64844773714707
+Maximum reward of collected rollouts: 82.29373877903024
+Time to generate rollouts: 7.180441379547119
+time to aggregate rollouts 0.011960983276367188
+Euclidean norm of update step: 367.40126346315304
+Time to sync statistics: 0.008507966995239258
+Mean reward of collected rollouts: -12.769445109539635
+Maximum reward of collected rollouts: 77.04873420464948
+Time to generate rollouts: 7.039874076843262
+time to aggregate rollouts 0.011505603790283203
+Euclidean norm of update step: 440.6353841385515
+It 239
+Mean reward of collected rollouts: 85.29659024610228
+Maximum reward of collected rollouts: 435.9854286593841
+Time to generate rollouts: 17.296002864837646
+--------------------------------------
+|             Time |        2.07e+03 |
+|        Iteration |             240 |
+|    AverageReward |            85.3 |
+|       StdRewards |            38.2 |
+| MaxRewardRollout |             436 |
+| MinRewardRollout |            45.4 |
+|        timesteps |         4.8e+06 |
+--------------------------------------
+Time to sync statistics: 0.0029578208923339844
+Mean reward of collected rollouts: -0.6679733075603351
+Maximum reward of collected rollouts: 294.05058292475866
+Time to generate rollouts: 7.043686866760254
+time to aggregate rollouts 0.01134037971496582
+Euclidean norm of update step: 376.76947372081634
+Time to sync statistics: 0.04796171188354492
+Mean reward of collected rollouts: 0.014008418727846106
+Maximum reward of collected rollouts: 157.09233278955966
+Time to generate rollouts: 7.071533918380737
+time to aggregate rollouts 0.011963844299316406
+Euclidean norm of update step: 395.9917456847811
+Time to sync statistics: 0.043808937072753906
+Mean reward of collected rollouts: -8.895133471765496
+Maximum reward of collected rollouts: 69.77845103090421
+Time to generate rollouts: 7.040434122085571
+time to aggregate rollouts 0.011670112609863281
+Euclidean norm of update step: 424.52850732502486
+Time to sync statistics: 0.047965288162231445
+Mean reward of collected rollouts: -9.7464356156833
+Maximum reward of collected rollouts: 71.67744380523673
+Time to generate rollouts: 6.994419813156128
+time to aggregate rollouts 0.011552810668945312
+Euclidean norm of update step: 430.1299357420035
+Time to sync statistics: 0.04286670684814453
+Mean reward of collected rollouts: -6.7910181627895465
+Maximum reward of collected rollouts: 73.6678903000647
+Time to generate rollouts: 7.205946922302246
+time to aggregate rollouts 0.015610694885253906
+Euclidean norm of update step: 387.3972873095294
+Time to sync statistics: 0.003349781036376953
+Mean reward of collected rollouts: 9.650062012268455
+Maximum reward of collected rollouts: 487.0889506982644
+Time to generate rollouts: 7.2852089405059814
+time to aggregate rollouts 0.01110696792602539
+Euclidean norm of update step: 361.27410145094274
+Time to sync statistics: 0.006902933120727539
+Mean reward of collected rollouts: -35.96588261169451
+Maximum reward of collected rollouts: 62.53735455641786
+Time to generate rollouts: 6.887705087661743
+time to aggregate rollouts 0.018416404724121094
+Euclidean norm of update step: 402.6984306516497
+Time to sync statistics: 0.02238297462463379
+Mean reward of collected rollouts: -22.258561798816697
+Maximum reward of collected rollouts: 51.49754934278879
+Time to generate rollouts: 6.898659944534302
+time to aggregate rollouts 0.02157282829284668
+Euclidean norm of update step: 409.9646127355498
+Time to sync statistics: 0.04297137260437012
+Mean reward of collected rollouts: -129.60918525945368
+Maximum reward of collected rollouts: 31.435317615861035
+Time to generate rollouts: 6.889718294143677
+time to aggregate rollouts 0.011594533920288086
+Euclidean norm of update step: 366.28349265221584
+Time to sync statistics: 0.04572701454162598
+Mean reward of collected rollouts: -58.15952746239127
+Maximum reward of collected rollouts: 8.355301501467139
+Time to generate rollouts: 6.989727258682251
+time to aggregate rollouts 0.01175546646118164
+Euclidean norm of update step: 360.7064602926307
+It 249
+Mean reward of collected rollouts: 2.360487962096649
+Maximum reward of collected rollouts: 12.719915103509473
+Time to generate rollouts: 16.22936987876892
+--------------------------------------
+|             Time |        2.16e+03 |
+|        Iteration |             250 |
+|    AverageReward |            2.36 |
+|       StdRewards |            6.52 |
+| MaxRewardRollout |            12.7 |
+| MinRewardRollout |           -13.7 |
+|        timesteps |           5e+06 |
+--------------------------------------
+Time to sync statistics: 0.0027408599853515625
+Mean reward of collected rollouts: -11.705646582313081
+Maximum reward of collected rollouts: 44.68093759080632
+Time to generate rollouts: 6.974228143692017
+time to aggregate rollouts 0.013034343719482422
+Euclidean norm of update step: 355.0529117619328
+Time to sync statistics: 0.04113340377807617
+Mean reward of collected rollouts: -13.01748873217208
+Maximum reward of collected rollouts: 72.48125010892201
+Time to generate rollouts: 6.998724699020386
+time to aggregate rollouts 0.011985301971435547
+Euclidean norm of update step: 410.40826664082806
+Time to sync statistics: 0.07410621643066406
+Mean reward of collected rollouts: -18.928283946244665
+Maximum reward of collected rollouts: 112.11676287238302
+Time to generate rollouts: 6.934919834136963
+time to aggregate rollouts 0.01140284538269043
+Euclidean norm of update step: 339.38497205635554
+Time to sync statistics: 0.02374577522277832
+Mean reward of collected rollouts: -26.242934226441584
+Maximum reward of collected rollouts: 43.797056563826715
+Time to generate rollouts: 6.819891929626465
+time to aggregate rollouts 0.012108325958251953
+Euclidean norm of update step: 409.6797294613215
+Time to sync statistics: 0.04644179344177246
+Mean reward of collected rollouts: -34.68576328406016
+Maximum reward of collected rollouts: 32.13682244888385
+Time to generate rollouts: 6.907556533813477
+time to aggregate rollouts 0.011768102645874023
+Euclidean norm of update step: 365.99345529008457
+Time to sync statistics: 0.04871678352355957
+Mean reward of collected rollouts: -32.70073955056442
+Maximum reward of collected rollouts: 48.82311973256799
+Time to generate rollouts: 6.803660869598389
+time to aggregate rollouts 0.011556863784790039
+Euclidean norm of update step: 441.20556411356546
+Time to sync statistics: 0.006009340286254883
+Mean reward of collected rollouts: -26.14911382019867
+Maximum reward of collected rollouts: 37.61523518634338
+Time to generate rollouts: 6.8521411418914795
+time to aggregate rollouts 0.011545181274414062
+Euclidean norm of update step: 359.3422570184579
+Time to sync statistics: 0.0037043094635009766
+Mean reward of collected rollouts: -13.735437277038415
+Maximum reward of collected rollouts: 77.61257717965256
+Time to generate rollouts: 6.812065362930298
+time to aggregate rollouts 0.01136016845703125
+Euclidean norm of update step: 413.3430452217052
+Time to sync statistics: 0.018347978591918945
+Mean reward of collected rollouts: -25.16430618535569
+Maximum reward of collected rollouts: 83.88421648427608
+Time to generate rollouts: 6.85577130317688
+time to aggregate rollouts 0.011545181274414062
+Euclidean norm of update step: 425.559307064419
+Time to sync statistics: 0.043235063552856445
+Mean reward of collected rollouts: -24.740852753407484
+Maximum reward of collected rollouts: 478.83680298665837
+Time to generate rollouts: 6.982785701751709
+time to aggregate rollouts 0.012441158294677734
+Euclidean norm of update step: 344.2341288357274
+It 259
+Mean reward of collected rollouts: -27.45613925791542
+Maximum reward of collected rollouts: -27.456139257915424
+Time to generate rollouts: 16.202353715896606
+--------------------------------------
+|             Time |        2.24e+03 |
+|        Iteration |             260 |
+|    AverageReward |           -27.5 |
+|       StdRewards |        3.55e-15 |
+| MaxRewardRollout |           -27.5 |
+| MinRewardRollout |           -27.5 |
+|        timesteps |         5.2e+06 |
+--------------------------------------
+Time to sync statistics: 0.004053354263305664
+Mean reward of collected rollouts: -19.969158520523692
+Maximum reward of collected rollouts: 90.35547336249738
+Time to generate rollouts: 6.824969053268433
+time to aggregate rollouts 0.016922712326049805
+Euclidean norm of update step: 410.29003092648014
+Time to sync statistics: 0.035518646240234375
+Mean reward of collected rollouts: -29.837874029383407
+Maximum reward of collected rollouts: 89.60039641261938
+Time to generate rollouts: 6.94553804397583
+time to aggregate rollouts 0.01778697967529297
+Euclidean norm of update step: 425.80153949466523
+Time to sync statistics: 0.029514551162719727
+Mean reward of collected rollouts: -19.731707702997948
+Maximum reward of collected rollouts: 96.53468129554234
+Time to generate rollouts: 6.999340295791626
+time to aggregate rollouts 0.01256251335144043
+Euclidean norm of update step: 410.9927325864572
+Time to sync statistics: 0.04131817817687988
+Mean reward of collected rollouts: -19.03383044914886
+Maximum reward of collected rollouts: 37.50092724766205
+Time to generate rollouts: 6.954843521118164
+time to aggregate rollouts 0.01150965690612793
+Euclidean norm of update step: 394.37711977235347
+Time to sync statistics: 0.05138516426086426
+Mean reward of collected rollouts: -12.378888121290853
+Maximum reward of collected rollouts: 112.97928242150206
+Time to generate rollouts: 7.0659356117248535
+time to aggregate rollouts 0.012314081192016602
+Euclidean norm of update step: 340.94341437365006
+Time to sync statistics: 0.006368160247802734
+Mean reward of collected rollouts: -12.93497119596021
+Maximum reward of collected rollouts: 29.3500340598884
+Time to generate rollouts: 7.079972505569458
+time to aggregate rollouts 0.011554241180419922
+Euclidean norm of update step: 401.5802506113216
+Time to sync statistics: 0.05068039894104004
+Mean reward of collected rollouts: -8.634273098313752
+Maximum reward of collected rollouts: 47.193009041172495
+Time to generate rollouts: 6.911929607391357
+time to aggregate rollouts 0.011599540710449219
+Euclidean norm of update step: 428.83353398942774
+Time to sync statistics: 0.043619632720947266
+Mean reward of collected rollouts: -1.8672182683018956
+Maximum reward of collected rollouts: 77.69308674836515
+Time to generate rollouts: 6.971956491470337
+time to aggregate rollouts 0.017987489700317383
+Euclidean norm of update step: 385.90988086667716
+Time to sync statistics: 0.022064924240112305
+Mean reward of collected rollouts: -14.608341816557488
+Maximum reward of collected rollouts: 27.081457673618296
+Time to generate rollouts: 6.969019412994385
+time to aggregate rollouts 0.015010833740234375
+Euclidean norm of update step: 439.42886729650866
+Time to sync statistics: 0.04409432411193848
+Mean reward of collected rollouts: -13.112802099737172
+Maximum reward of collected rollouts: 93.93215113942598
+Time to generate rollouts: 6.909917593002319
+time to aggregate rollouts 0.011701345443725586
+Euclidean norm of update step: 309.2706202108102
+It 269
+Mean reward of collected rollouts: -11.766788660115186
+Maximum reward of collected rollouts: -4.935557047546954
+Time to generate rollouts: 16.65811562538147
+--------------------------------------
+|             Time |        2.33e+03 |
+|        Iteration |             270 |
+|    AverageReward |           -11.8 |
+|       StdRewards |            3.27 |
+| MaxRewardRollout |           -4.94 |
+| MinRewardRollout |           -19.1 |
+|        timesteps |         5.4e+06 |
+--------------------------------------
+Time to sync statistics: 0.003642559051513672
+Mean reward of collected rollouts: -9.177751241458216
+Maximum reward of collected rollouts: 264.5925314616496
+Time to generate rollouts: 6.935428619384766
+time to aggregate rollouts 0.022983074188232422
+Euclidean norm of update step: 349.5533546544002
+Time to sync statistics: 0.0036160945892333984
+Mean reward of collected rollouts: -43.155366917850685
+Maximum reward of collected rollouts: 110.25312414251434
+Time to generate rollouts: 7.137576103210449
+time to aggregate rollouts 0.011929512023925781
+Euclidean norm of update step: 395.3973523293134
+Time to sync statistics: 0.04430413246154785
+Mean reward of collected rollouts: -2.0874198738937464
+Maximum reward of collected rollouts: 84.68911046090571
+Time to generate rollouts: 6.849981307983398
+time to aggregate rollouts 0.018049240112304688
+Euclidean norm of update step: 450.2156055731051
+Time to sync statistics: 0.00763392448425293
+Mean reward of collected rollouts: -8.091187995016048
+Maximum reward of collected rollouts: 49.450045688344424
+Time to generate rollouts: 7.063795328140259
+time to aggregate rollouts 0.012432575225830078
+Euclidean norm of update step: 470.0662113167323
+Time to sync statistics: 0.025814056396484375
+Mean reward of collected rollouts: -0.5371567739646309
+Maximum reward of collected rollouts: 134.17299866761442
+Time to generate rollouts: 6.949463605880737
+time to aggregate rollouts 0.018963336944580078
+Euclidean norm of update step: 423.0174842084226
+Time to sync statistics: 0.0035028457641601562
+Mean reward of collected rollouts: -1.093519668645247
+Maximum reward of collected rollouts: 63.28727573419119
+Time to generate rollouts: 6.936828851699829
+time to aggregate rollouts 0.020036935806274414
+Euclidean norm of update step: 400.64868409203774
+Time to sync statistics: 0.02709484100341797
+Mean reward of collected rollouts: 9.92194370825435
+Maximum reward of collected rollouts: 121.45435680650574
+Time to generate rollouts: 6.841192960739136
+time to aggregate rollouts 0.011426448822021484
+Euclidean norm of update step: 403.00034152745957
+Time to sync statistics: 0.008329629898071289
+Mean reward of collected rollouts: 2.7339875595004153
+Maximum reward of collected rollouts: 78.13068869320688
+Time to generate rollouts: 6.7721030712127686
+time to aggregate rollouts 0.0160367488861084
+Euclidean norm of update step: 353.70182566746826
+Time to sync statistics: 0.03420734405517578
+Mean reward of collected rollouts: 10.569377356936293
+Maximum reward of collected rollouts: 131.37925284041734
+Time to generate rollouts: 6.715753078460693
+time to aggregate rollouts 0.012273073196411133
+Euclidean norm of update step: 424.5983708619417
+Time to sync statistics: 0.04156136512756348
+Mean reward of collected rollouts: -1.1512393749338166
+Maximum reward of collected rollouts: 47.70803102970565
+Time to generate rollouts: 6.584696292877197
+time to aggregate rollouts 0.018924236297607422
+Euclidean norm of update step: 389.1061269973768
+It 279
+Mean reward of collected rollouts: -16.817604268900656
+Maximum reward of collected rollouts: -16.817604268900663
+Time to generate rollouts: 15.78385591506958
+--------------------------------------
+|             Time |        2.41e+03 |
+|        Iteration |             280 |
+|    AverageReward |           -16.8 |
+|       StdRewards |        7.11e-15 |
+| MaxRewardRollout |           -16.8 |
+| MinRewardRollout |           -16.8 |
+|        timesteps |         5.6e+06 |
+--------------------------------------
+Time to sync statistics: 0.003073453903198242
+Mean reward of collected rollouts: -4.447763006822738
+Maximum reward of collected rollouts: 65.86127860792178
+Time to generate rollouts: 6.641893148422241
+time to aggregate rollouts 0.011518001556396484
+Euclidean norm of update step: 426.5905996643972
+Time to sync statistics: 0.009712696075439453
+Mean reward of collected rollouts: -5.769252433251898
+Maximum reward of collected rollouts: 71.52677573932338
+Time to generate rollouts: 6.7825140953063965
+time to aggregate rollouts 0.018625736236572266
+Euclidean norm of update step: 396.3244802549093
+Time to sync statistics: 0.019968271255493164
+Mean reward of collected rollouts: -7.234831149806245
+Maximum reward of collected rollouts: 44.227514815397484
+Time to generate rollouts: 6.862929105758667
+time to aggregate rollouts 0.011378049850463867
+Euclidean norm of update step: 469.953933090212
+Time to sync statistics: 0.003718137741088867
+Mean reward of collected rollouts: -4.472583179317631
+Maximum reward of collected rollouts: 94.98482144012264
+Time to generate rollouts: 6.665452718734741
+time to aggregate rollouts 0.011713981628417969
+Euclidean norm of update step: 446.26037620846756
+Time to sync statistics: 0.00393986701965332
+Mean reward of collected rollouts: 15.803339462443697
+Maximum reward of collected rollouts: 825.3620844176598
+Time to generate rollouts: 6.748993396759033
+time to aggregate rollouts 0.016533613204956055
+Euclidean norm of update step: 362.34819921847856
+Time to sync statistics: 0.0031490325927734375
+Mean reward of collected rollouts: 6.238723705634592
+Maximum reward of collected rollouts: 247.5041700847314
+Time to generate rollouts: 6.710814476013184
+time to aggregate rollouts 0.011438131332397461
+Euclidean norm of update step: 375.4458415818375
+Time to sync statistics: 0.010087728500366211
+Mean reward of collected rollouts: -2.81611169933645
+Maximum reward of collected rollouts: 111.16594207659932
+Time to generate rollouts: 6.66671895980835
+time to aggregate rollouts 0.010895013809204102
+Euclidean norm of update step: 354.8716841474729
+Time to sync statistics: 0.004896402359008789
+Mean reward of collected rollouts: -5.442730725204033
+Maximum reward of collected rollouts: 69.95816743037969
+Time to generate rollouts: 6.708940029144287
+time to aggregate rollouts 0.011543989181518555
+Euclidean norm of update step: 387.97492360316886
+Time to sync statistics: 0.003462553024291992
+Mean reward of collected rollouts: -12.429206419573188
+Maximum reward of collected rollouts: 82.26868877266817
+Time to generate rollouts: 6.690995216369629
+time to aggregate rollouts 0.0184323787689209
+Euclidean norm of update step: 389.63135821583586
+Time to sync statistics: 0.009980916976928711
+Mean reward of collected rollouts: -42.337491585248685
+Maximum reward of collected rollouts: 68.22578060947488
+Time to generate rollouts: 6.751311779022217
+time to aggregate rollouts 0.011202096939086914
+Euclidean norm of update step: 441.1724837249499
+It 289
+Mean reward of collected rollouts: -42.74911108440876
+Maximum reward of collected rollouts: -34.48819699694515
+Time to generate rollouts: 15.291600227355957
+--------------------------------------
+|             Time |         2.5e+03 |
+|        Iteration |             290 |
+|    AverageReward |           -42.7 |
+|       StdRewards |            4.78 |
+| MaxRewardRollout |           -34.5 |
+| MinRewardRollout |           -53.8 |
+|        timesteps |         5.8e+06 |
+--------------------------------------
+Time to sync statistics: 0.003897428512573242
+Mean reward of collected rollouts: 10.742871812818015
+Maximum reward of collected rollouts: 78.18519009202272
+Time to generate rollouts: 6.7538743019104
+time to aggregate rollouts 0.01617598533630371
+Euclidean norm of update step: 365.7756210694013
+Time to sync statistics: 0.008685588836669922
+Mean reward of collected rollouts: 11.089164384217547
+Maximum reward of collected rollouts: 317.0674316093507
+Time to generate rollouts: 6.694715738296509
+time to aggregate rollouts 0.011218070983886719
+Euclidean norm of update step: 380.7442214582677
+Time to sync statistics: 0.0070078372955322266
+Mean reward of collected rollouts: -13.071628690827216
+Maximum reward of collected rollouts: 88.0021296647545
+Time to generate rollouts: 6.762325286865234
+time to aggregate rollouts 0.011271476745605469
+Euclidean norm of update step: 428.17092015322686
+Time to sync statistics: 0.006425142288208008
+Mean reward of collected rollouts: -14.134737787733467
+Maximum reward of collected rollouts: 59.59646172985563
+Time to generate rollouts: 6.741678714752197
+time to aggregate rollouts 0.011675596237182617
+Euclidean norm of update step: 418.2324334054084
+Time to sync statistics: 0.011985540390014648
+Mean reward of collected rollouts: -2.872232294751135
+Maximum reward of collected rollouts: 86.02209990386723
+Time to generate rollouts: 6.746988296508789
+time to aggregate rollouts 0.011259317398071289
+Euclidean norm of update step: 425.0429978486166
+Time to sync statistics: 0.004686832427978516
+Mean reward of collected rollouts: -6.054186967692283
+Maximum reward of collected rollouts: 91.29559568838306
+Time to generate rollouts: 6.706958532333374
+time to aggregate rollouts 0.01162576675415039
+Euclidean norm of update step: 351.8176575908067
+Time to sync statistics: 0.024248361587524414
+Mean reward of collected rollouts: -12.033776511068716
+Maximum reward of collected rollouts: 43.750480543425184
+Time to generate rollouts: 6.637816429138184
+time to aggregate rollouts 0.0117645263671875
+Euclidean norm of update step: 323.54053441307286
+Time to sync statistics: 0.0036034584045410156
+Mean reward of collected rollouts: -1.9450181016455113
+Maximum reward of collected rollouts: 121.78019598490108
+Time to generate rollouts: 6.638647079467773
+time to aggregate rollouts 0.011011362075805664
+Euclidean norm of update step: 440.7064986207503
+Time to sync statistics: 0.0039691925048828125
+Mean reward of collected rollouts: 1.8562313480847634
+Maximum reward of collected rollouts: 354.1402686462805
+Time to generate rollouts: 6.67673659324646
+time to aggregate rollouts 0.011124134063720703
+Euclidean norm of update step: 368.62329885708385
+Time to sync statistics: 0.009199857711791992
+Mean reward of collected rollouts: 6.774550891197066
+Maximum reward of collected rollouts: 419.8178004152149
+Time to generate rollouts: 6.64922833442688
+time to aggregate rollouts 0.011594533920288086
+Euclidean norm of update step: 362.19400125229095
+It 299
+Mean reward of collected rollouts: 69.05705963099668
+Maximum reward of collected rollouts: 920.5118739269018
+Time to generate rollouts: 15.529097557067871
+--------------------------------------
+|             Time |        2.58e+03 |
+|        Iteration |             300 |
+|    AverageReward |            69.1 |
+|       StdRewards |             119 |
+| MaxRewardRollout |             921 |
+| MinRewardRollout |              18 |
+|        timesteps |           6e+06 |
+--------------------------------------
+Time to sync statistics: 0.004023075103759766
+Best eval policy mean reward: 85.29659024610228
