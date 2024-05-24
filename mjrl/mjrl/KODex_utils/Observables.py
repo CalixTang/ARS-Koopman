@@ -9,6 +9,65 @@ from mjrl.KODex_utils.gnn_networks import InteractionNetwork
 import copy
 import torch
 
+class KoopmanObservable(object):
+    def __init__(self, num_envStates):
+        self.num_states = num_envStates
+    
+    def z(self, envState):  
+        """
+        Lifts the environment state from state space to full "observable space' (Koopman). g(x) = z.
+        Inputs: environment states
+        Outputs: state in lifted space
+        """
+
+        #initialize lifted state arr
+        obs = np.zeros(KoopmanObservable.compute_observable(self.num_states))
+        index = 0
+
+        #for consistency, I keep the same order of functions as DraftedObservable as used in KODex/CIMER
+
+        #x[i]
+        for i in range(self.num_states):
+            obs[index] = envState[i]
+            index += 1
+
+        #x[i]^2
+        for i in range(self.num_states):
+            obs[index] = envState[i] ** 2
+            index += 1  
+
+        #x[i] x[j] w/o repetition
+        for i in range(self.num_states):
+            for j in range(i + 1, self.num_states):
+                obs[index] = envState[i] * envState[j]
+                index += 1
+
+        # x[i]^2 x[j] w/ repetition - I removed the x[i]^3 here b/c this block includes x[i]^3
+        for i in range(self.num_states):
+            for j in range(self.num_states):
+                obs[index] = (envState[i] ** 2) * envState[j]
+                index += 1
+        return obs
+    
+    def compute_observable(num_states):
+        """
+        Returns the number of observables for a given state space.
+        """
+
+        #x[i], x[i]^2, x[i] x[j] w/o rep, x[i]^2 x[j]
+
+        
+        return 2 * num_states + (num_states * (num_states - 1) // 2) + num_states ** 2
+        
+    
+    def compute_observables_from_self(self):
+        """
+        Observation functions: original states, original states^2, cross product of hand states
+        """
+        return KoopmanObservable.compute_observable(self.num_states)
+        
+
+
 class DraftedObservable(object):
     def __init__(self, num_handStates, num_objStates):
         self.num_ori_handStates = num_handStates
