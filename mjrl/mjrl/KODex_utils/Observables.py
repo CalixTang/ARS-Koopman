@@ -126,8 +126,45 @@ class ManipulationObservable(Observable):
         super().__init__(num_hand_states + num_obj_states)
         self.num_hand_states = num_hand_states
         self.num_obj_states = num_obj_states
-    
-    
+
+    def z(self, hand_state, obj_state):  
+        """
+        Inputs: hand states(pos, vel) & object states(pos, vel)
+        Outputs: state in lifted space
+        Note: velocity is optional
+        """
+        # hand_state.shape[0] == self.num_hand_states necessary
+        # obj_state.shape[0] == self.num_obj_states necessary
+
+        obs = np.zeros(self.compute_observables_from_self())
+        index = 0
+
+        obs[index : index + self.num_hand_states] = hand_state[:]
+        index += self.num_hand_states
+
+        obs[index : index + self.num_hand_states] = hand_state[:] ** 2
+        index += self.num_hand_states
+
+        obs[index : index + self.num_obj_states] = obj_state[:]
+        index += self.num_obj_states
+
+        obs[index : index + self.num_obj_states] = obj_state[:] ** 2
+        index += self.num_obj_states
+
+        obj = obj_state[:, np.newaxis]
+        obs[index : index + (self.num_obj_states * (self.num_obj_states - 1) // 2)] = (obj @ obj.T)[np.triu_indices(self.num_obj_states, k = 1)]
+        index += (self.num_obj_states * (self.num_obj_states - 1) // 2)
+
+        hand = hand_state[:, np.newaxis]
+        obs[index : index + (self.num_hand_states * (self.num_hand_states - 1) //2)] = (hand @ hand.T)[np.triu_indices(self.num_hand_states, k = 1)]
+        index += (self.num_hand_states * (self.num_hand_states - 1) // 2)
+
+        obs[index : index + self.num_hand_states] = hand_state[:] ** 3
+        index += self.num_hand_states
+
+        obs[index : index + self.num_obj_states ** 2] = np.flatten((obj**2) @ (obj.T))
+        index += self.num_obj_states ** 2
+        return obs
     
     def compute_observable(self, num_hand, num_obj):
         """
