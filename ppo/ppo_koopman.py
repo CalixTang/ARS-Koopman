@@ -1,5 +1,5 @@
 '''
-https://github.com/ericyangyu/PPO-for-Beginners/blob/master/part4/ppo_for_beginners/ppo_optimized.py
+this PPO2 implementation is taken from https://github.com/ericyangyu/PPO-for-Beginners/blob/master/part4/ppo_for_beginners/ppo_optimized.py
 '''
 
 
@@ -21,6 +21,7 @@ from torch.distributions import MultivariateNormal
 
 import os
 
+
 class PPO:
     """
         This is the PPO class we will use as our model in main.py
@@ -41,19 +42,18 @@ class PPO:
         # Make sure the environment is compatible with our code
         assert(type(env.observation_space) == gym.spaces.Box)
         assert(type(env.action_space) == gym.spaces.Box)
-
+        
         # Initialize hyperparameters for training with PPO
         self._init_hyperparameters(hyperparameters)
 
         # Extract environment information
         self.env = env
+        
         self.obs_dim = env.observation_space.shape[0]
         self.act_dim = env.action_space.shape[0]
 
-
-        #TODO: define the actor and critic networks and change __init__ as necessary
-         # Initialize actor and critic networks
-        self.actor = actor                                                  # ALG STEP 1
+        # Initialize actor and critic networks
+        self.actor = actor                                                 # ALG STEP 1
         self.critic = critic
 
         # Initialize optimizers for actor and critic
@@ -72,8 +72,8 @@ class PPO:
             'batch_lens': [],       # episodic lengths in batch
             'batch_rews': [],       # episodic returns in batch
             'actor_losses': [],     # losses of actor network in current iteration
+            'lr': 0,
         }
-
     def learn(self, total_timesteps):
         """
             Train the actor and critic networks. Here is where the main PPO algorithm resides.
@@ -90,8 +90,13 @@ class PPO:
         i_so_far = 0 # Iterations ran so far
         while t_so_far < total_timesteps:                                                                       # ALG STEP 2
             # Autobots, roll out (just kidding, we're collecting our batch simulations here)
-            batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens = self.rollout()                     # ALG STEP 3
-
+            batch_obs, batch_acts, batch_log_probs, batch_rews, batch_lens, batch_vals, batch_dones = self.rollout()                     # ALG STEP 3
+            
+            # Calculate advantage using GAE
+            A_k = self.calculate_gae(batch_rews, batch_vals, batch_dones) 
+            V = self.critic(batch_obs).squeeze()
+            batch_rtgs = A_k + V.detach()   
+            
             # Calculate how many timesteps we collected this batch
             t_so_far += np.sum(batch_lens)
 
@@ -102,10 +107,6 @@ class PPO:
             self.logger['t_so_far'] = t_so_far
             self.logger['i_so_far'] = i_so_far
 
-            # Calculate advantage at k-th iteration
-            V, _ = self.evaluate(batch_obs, batch_acts)
-            A_k = batch_rtgs - V.detach()                                                                       # ALG STEP 5
-
             # One of the only tricks I use that isn't in the pseudocode. Normalizing advantages
             # isn't theoretically necessary, but in practice it decreases the variance of 
             # our advantages and makes convergence much more stable and faster. I added this because
@@ -113,42 +114,85 @@ class PPO:
             A_k = (A_k - A_k.mean()) / (A_k.std() + 1e-10)
 
             # This is the loop where we update our network for some n epochs
+            step = batch_obs.size(0)
+            inds = np.arange(step)
+            minibatch_size = step // self.num_minibatches
+            loss = []
+
             for _ in range(self.n_updates_per_iteration):                                                       # ALG STEP 6 & 7
-                # Calculate V_phi and pi_theta(a_t | s_t)
-                V, curr_log_probs = self.evaluate(batch_obs, batch_acts)
+                # Learning Rate Annealing
+                frac = (t_so_far - 1.0) / total_timesteps
+                new_lr = self.lr * (1.0 - frac)
 
-                # Calculate the ratio pi_theta(a_t | s_t) / pi_theta_k(a_t | s_t)
-                # NOTE: we just subtract the logs, which is the same as
-                # dividing the values and then canceling the log with e^log.
-                # For why we use log probabilities instead of actual probabilities,
-                # here's a great explanation: 
-                # https://cs.stackexchange.com/questions/70518/why-do-we-use-the-log-in-gradient-based-reinforcement-algorithms
-                # TL;DR makes gradient ascent easier behind the scenes.
-                ratios = torch.exp(curr_log_probs - batch_log_probs)
+                # Make sure learning rate doesn't go below 0
+                new_lr = max(new_lr, 0.0)
+                self.actor_optim.param_groups[0]["lr"] = new_lr
+                self.critic_optim.param_groups[0]["lr"] = new_lr
+                # Log learning rate
+                self.logger['lr'] = new_lr
 
-                # Calculate surrogate losses.
-                surr1 = ratios * A_k
-                surr2 = torch.clamp(ratios, 1 - self.clip, 1 + self.clip) * A_k
+                # Mini-batch Update
+                np.random.shuffle(inds) # Shuffling the index
+                for start in range(0, step, minibatch_size):
+                    end = start + minibatch_size
+                    idx = inds[start:end]
+                    # Extract data at the sampled indices
+                    mini_obs = batch_obs[idx]
+                    mini_acts = batch_acts[idx]
+                    mini_log_prob = batch_log_probs[idx]
+                    mini_advantage = A_k[idx]
+                    mini_rtgs = batch_rtgs[idx]
 
-                # Calculate actor and critic losses.
-                # NOTE: we take the negative min of the surrogate losses because we're trying to maximize
-                # the performance function, but Adam minimizes the loss. So minimizing the negative
-                # performance function maximizes it.
-                actor_loss = (-torch.min(surr1, surr2)).mean()
-                critic_loss = nn.MSELoss()(V, batch_rtgs)
+                    # Calculate V_phi and pi_theta(a_t | s_t) and entropy
+                    V, curr_log_probs, entropy = self.evaluate(mini_obs, mini_acts)
 
-                # Calculate gradients and perform backward propagation for actor network
-                self.actor_optim.zero_grad()
-                actor_loss.backward(retain_graph=True)
-                self.actor_optim.step()
+                    # Calculate the ratio pi_theta(a_t | s_t) / pi_theta_k(a_t | s_t)
+                    # NOTE: we just subtract the logs, which is the same as
+                    # dividing the values and then canceling the log with e^log.
+                    # For why we use log probabilities instead of actual probabilities,
+                    # here's a great explanation: 
+                    # https://cs.stackexchange.com/questions/70518/why-do-we-use-the-log-in-gradient-based-reinforcement-algorithms
+                    # TL;DR makes gradient descent easier behind the scenes.
+                    logratios = curr_log_probs - mini_log_prob
+                    ratios = torch.exp(logratios)
+                    approx_kl = ((ratios - 1) - logratios).mean()
 
-                # Calculate gradients and perform backward propagation for critic network
-                self.critic_optim.zero_grad()
-                critic_loss.backward()
-                self.critic_optim.step()
+                    # Calculate surrogate losses.
+                    surr1 = ratios * mini_advantage
+                    surr2 = torch.clamp(ratios, 1 - self.clip, 1 + self.clip) * mini_advantage
 
-                # Log actor loss
-                self.logger['actor_losses'].append(actor_loss.detach())
+                    # Calculate actor and critic losses.
+                    # NOTE: we take the negative min of the surrogate losses because we're trying to maximize
+                    # the performance function, but Adam minimizes the loss. So minimizing the negative
+                    # performance function maximizes it.
+                    actor_loss = (-torch.min(surr1, surr2)).mean()
+                    critic_loss = nn.MSELoss()(V, mini_rtgs)
+
+                    # Entropy Regularization
+                    entropy_loss = entropy.mean()
+                    # Discount entropy loss by given coefficient
+                    actor_loss = actor_loss - self.ent_coef * entropy_loss                    
+                    
+                    # Calculate gradients and perform backward propagation for actor network
+                    self.actor_optim.zero_grad()
+                    actor_loss.backward(retain_graph=True)
+                    # Gradient Clipping with given threshold
+                    nn.utils.clip_grad_norm_(self.actor.parameters(), self.max_grad_norm)
+                    self.actor_optim.step()
+
+                    # Calculate gradients and perform backward propagation for critic network
+                    self.critic_optim.zero_grad()
+                    critic_loss.backward()
+                    nn.utils.clip_grad_norm_(self.critic.parameters(), self.max_grad_norm)
+                    self.critic_optim.step()
+
+                    loss.append(actor_loss.detach())
+                # Approximating KL Divergence
+                if approx_kl > self.target_kl:
+                    break # if kl aboves threshold
+            # Log actor loss
+            avg_loss = sum(loss) / len(loss)
+            self.logger['actor_losses'].append(avg_loss)
 
             # Print a summary of our training so far
             self._log_summary()
@@ -158,49 +202,69 @@ class PPO:
                 torch.save(self.actor.state_dict(), './ppo_actor.pth')
                 torch.save(self.critic.state_dict(), './ppo_critic.pth')
 
+    def calculate_gae(self, rewards, values, dones):
+        batch_advantages = []  # List to store computed advantages for each timestep
+
+        # Iterate over each episode's rewards, values, and done flags
+        for ep_rews, ep_vals, ep_dones in zip(rewards, values, dones):
+            advantages = []  # List to store advantages for the current episode
+            last_advantage = 0  # Initialize the last computed advantage
+
+            # Calculate episode advantage in reverse order (from last timestep to first)
+            for t in reversed(range(len(ep_rews))):
+                if t + 1 < len(ep_rews):
+                    # Calculate the temporal difference (TD) error for the current timestep
+                    delta = ep_rews[t] + self.gamma * ep_vals[t+1] * (1 - ep_dones[t+1]) - ep_vals[t]
+                else:
+                    # Special case at the boundary (last timestep)
+                    delta = ep_rews[t] - ep_vals[t]
+
+                # Calculate Generalized Advantage Estimation (GAE) for the current timestep
+                advantage = delta + self.gamma * self.lam * (1 - ep_dones[t]) * last_advantage
+                last_advantage = advantage  # Update the last advantage for the next timestep
+                advantages.insert(0, advantage)  # Insert advantage at the beginning of the list
+
+            # Extend the batch_advantages list with advantages computed for the current episode
+            batch_advantages.extend(advantages)
+
+        # Convert the batch_advantages list to a PyTorch tensor of type float
+        return torch.tensor(batch_advantages, dtype=torch.float)
+
+
     def rollout(self):
-        """
-            Too many transformers references, I'm sorry. This is where we collect the batch of data
-            from simulation. Since this is an on-policy algorithm, we'll need to collect a fresh batch
-            of data each time we iterate the actor/critic networks.
-
-            Parameters:
-                None
-
-            Return:
-                batch_obs - the observations collected this batch. Shape: (number of timesteps, dimension of observation)
-                batch_acts - the actions collected this batch. Shape: (number of timesteps, dimension of action)
-                batch_log_probs - the log probabilities of each action taken this batch. Shape: (number of timesteps)
-                batch_rtgs - the Rewards-To-Go of each timestep in this batch. Shape: (number of timesteps)
-                batch_lens - the lengths of each episode this batch. Shape: (number of episodes)
-        """
-        # Batch data. For more details, check function header.
+       
         batch_obs = []
         batch_acts = []
         batch_log_probs = []
         batch_rews = []
-        batch_rtgs = []
         batch_lens = []
+        batch_vals = []
+        batch_dones = []
 
         # Episodic data. Keeps track of rewards per episode, will get cleared
         # upon each new episode
         ep_rews = []
-
+        ep_vals = []
+        ep_dones = []
         t = 0 # Keeps track of how many timesteps we've run so far this batch
 
         # Keep simulating until we've run more than or equal to specified timesteps per batch
         while t < self.timesteps_per_batch:
             ep_rews = [] # rewards collected per episode
-
-            # Reset the environment. sNote that obs is short for observation. 
-            obs = self.env.reset()
+            ep_vals = [] # state values collected per episode
+            ep_dones = [] # done flag collected per episode
+            # Reset the environment. Note that obs is short for observation. 
+            obs, _ = self.env.reset()
+            # Initially, the game is not done
             done = False
 
             # Run an episode for a maximum of max_timesteps_per_episode timesteps
             for ep_t in range(self.max_timesteps_per_episode):
                 # If render is specified, render the environment
-                if self.render and (self.logger['i_so_far'] % self.render_every_i == 0) and len(batch_lens) == 0:
+                if self.render:
                     self.env.render()
+                # Track done flag of the current state
+                ep_dones.append(done)
 
                 t += 1 # Increment timesteps ran this batch so far
 
@@ -210,10 +274,13 @@ class PPO:
                 # Calculate action and make a step in the env. 
                 # Note that rew is short for reward.
                 action, log_prob = self.get_action(obs)
-                obs, rew, done, _ = self.env.step(action)
+                val = self.critic(obs)
 
+                obs, rew, terminated, truncated, _ = self.env.step(action)
+                done = terminated or truncated
                 # Track recent reward, action, and action log probability
                 ep_rews.append(rew)
+                ep_vals.append(val.flatten())
                 batch_acts.append(action)
                 batch_log_probs.append(log_prob)
 
@@ -221,51 +288,22 @@ class PPO:
                 if done:
                     break
 
-            # Track episodic lengths and rewards
+            # Track episodic lengths, rewards, state values, and done flags
             batch_lens.append(ep_t + 1)
             batch_rews.append(ep_rews)
-
+            batch_vals.append(ep_vals)
+            batch_dones.append(ep_dones)
         # Reshape data as tensors in the shape specified in function description, before returning
         batch_obs = torch.tensor(batch_obs, dtype=torch.float)
         batch_acts = torch.tensor(batch_acts, dtype=torch.float)
-        batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float)
-        batch_rtgs = self.compute_rtgs(batch_rews)                                                              # ALG STEP 4
+        batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float).flatten()
 
         # Log the episodic returns and episodic lengths in this batch.
         self.logger['batch_rews'] = batch_rews
         self.logger['batch_lens'] = batch_lens
 
-        return batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens
-
-    def compute_rtgs(self, batch_rews):
-        """
-            Compute the Reward-To-Go of each timestep in a batch given the rewards.
-
-            Parameters:
-                batch_rews - the rewards in a batch, Shape: (number of episodes, number of timesteps per episode)
-
-            Return:
-                batch_rtgs - the rewards to go, Shape: (number of timesteps in batch)
-        """
-        # The rewards-to-go (rtg) per episode per batch to return.
-        # The shape will be (num timesteps per episode)
-        batch_rtgs = []
-
-        # Iterate through each episode
-        for ep_rews in reversed(batch_rews):
-
-            discounted_reward = 0 # The discounted reward so far
-
-            # Iterate through all rewards in the episode. We go backwards for smoother calculation of each
-            # discounted return (think about why it would be harder starting from the beginning)
-            for rew in reversed(ep_rews):
-                discounted_reward = rew + discounted_reward * self.gamma
-                batch_rtgs.insert(0, discounted_reward)
-
-        # Convert the rewards-to-go into a tensor
-        batch_rtgs = torch.tensor(batch_rtgs, dtype=torch.float)
-
-        return batch_rtgs
+        # Here, we return the batch_rews instead of batch_rtgs for later calculation of GAE
+        return batch_obs, batch_acts, batch_log_probs, batch_rews, batch_lens, batch_vals,batch_dones
 
     def get_action(self, obs):
         """
@@ -279,6 +317,7 @@ class PPO:
                 log_prob - the log probability of the selected action in the distribution
         """
         # Query the actor network for a mean action
+        obs = torch.tensor(obs,dtype=torch.float)
         mean = self.actor(obs)
 
         # Create a distribution with the mean action and std from the covariance matrix above.
@@ -291,6 +330,11 @@ class PPO:
 
         # Calculate the log probability for that action
         log_prob = dist.log_prob(action)
+
+        # If we're testing, just return the deterministic action. Sampling should only be for training
+        # as our "exploration" factor.
+        if self.deterministic:
+            return mean.detach().numpy(), 1
 
         # Return the sampled action and the log probability of that action in our distribution
         return action.detach().numpy(), log_prob.detach()
@@ -306,12 +350,13 @@ class PPO:
                             Shape: (number of timesteps in batch, dimension of observation)
                 batch_acts - the actions from the most recently collected batch as a tensor.
                             Shape: (number of timesteps in batch, dimension of action)
-
-            Return:
-                V - the predicted values of batch_obs
-                log_probs - the log probabilities of the actions taken in batch_acts given batch_obs
+                batch_rtgs - the rewards-to-go calculated in the most recently collected
+                                batch as a tensor. Shape: (number of timesteps in batch)
         """
         # Query critic network for a value V for each batch_obs. Shape of V should be same as batch_rtgs
+        # if batch_obs.size(0) == 1:
+        #     V = self.critic(batch_obs)
+        # else:
         V = self.critic(batch_obs).squeeze()
 
         # Calculate the log probabilities of batch actions using most recent actor network.
@@ -322,7 +367,7 @@ class PPO:
 
         # Return the value vector V of each observation in the batch
         # and log probabilities log_probs of each action in the batch
-        return V, log_probs
+        return V, log_probs, dist.entropy()
 
     def _init_hyperparameters(self, hyperparameters):
         """
@@ -343,17 +388,24 @@ class PPO:
         self.lr = 0.005                                 # Learning rate of actor optimizer
         self.gamma = 0.95                               # Discount factor to be applied when calculating Rewards-To-Go
         self.clip = 0.2                                 # Recommended 0.2, helps define the threshold to clip the ratio during SGA
+        self.lam = 0.98                                 # Lambda Parameter for GAE 
+        self.num_minibatches = 6                        # Number of mini-batches for Mini-batch Update
+        self.ent_coef = 0                               # Entropy coefficient for Entropy Regularization
+        self.target_kl = 0.02                           # KL Divergence threshold
+        self.max_grad_norm = 0.5                        # Gradient Clipping threshold
+
 
         # Miscellaneous parameters
-        self.render = False                             # If we should render during rollout - almost never for us
-        self.render_every_i = 10                        # Only render every n iterations
+        self.render = False                             # If we should render during rollout
         self.save_freq = 10                             # How often we save in number of iterations
-        self.seed = None                                # Sets the seed of our program, used for reproducibility of results
+        self.deterministic = False                      # If we're testing, don't sample actions
+        self.seed = None								# Sets the seed of our program, used for reproducibility of results
+        self.shift = 0                                  # Shifts the reward in a direction during training to dissaude learning policies that do nothing (from ARS)
 
         # Change any default values to custom values for specified hyperparameters
         for param, val in hyperparameters.items():
             exec('self.' + param + ' = ' + str(val))
-
+        
         # Sets the seed if specified
         if self.seed != None:
             # Check if our seed is valid first
@@ -383,6 +435,7 @@ class PPO:
 
         t_so_far = self.logger['t_so_far']
         i_so_far = self.logger['i_so_far']
+        lr = self.logger['lr']
         avg_ep_lens = np.mean(self.logger['batch_lens'])
         avg_ep_rews = np.mean([np.sum(ep_rews) for ep_rews in self.logger['batch_rews']])
         avg_actor_loss = np.mean([losses.float().mean() for losses in self.logger['actor_losses']])
@@ -400,6 +453,7 @@ class PPO:
         print(f"Average Loss: {avg_actor_loss}", flush=True)
         print(f"Timesteps So Far: {t_so_far}", flush=True)
         print(f"Iteration took: {delta_t} secs", flush=True)
+        print(f"Learning rate: {lr}", flush=True)
         print(f"------------------------------------------------------", flush=True)
         print(flush=True)
 
@@ -456,8 +510,20 @@ def run_ppo(params):
     os.makedirs(logdir)
     
     ppo_hyperparameters = {
-        "": 0
-	}
+        'timesteps_per_batch': params.timesteps_per_batch,
+        'max_timesteps_per_episode': params.max_timesetps_per_episode,
+        'n_updates_per_iteration': params.n_updates_per_iteration,
+        'lr': params.ppo_lr,
+        'gamma': params.ppo_gamma,
+        'clip': params.clip, 
+        'lam': params.lam, 
+        'num_minibatches': params.num_minibatches,
+        'ent_coef': params.ent_coef,
+        'target_kl': params.target_kl,
+        'max_grad_norm': params.max_grad_norm, 
+        'shift': params.shift,
+        'seed': params.seed
+    }
     
 
 	#TODO: set up vectorized environments and a dummy single env for getting obs and ac dim
@@ -498,10 +564,16 @@ if __name__ == '__main__':
     parser.add_argument('--ppo_lr', type = float, default = 5e-3) #LR for actor
     parser.add_argument('--ppo_gamma', type = float, default = 0.95) #reward discount factor
     parser.add_argument('--clip', type = float, default = 0.2) #ppo clipping epsilon (1 + eps, 1 - eps).
+    #PPO2 args
+    parser.add_argument('--lam', type = float, default = 0.98) #lambda param for GAE 
+    parser.add_argument('--num_minibatches', type = int, default = 6) # Number of mini-batches for Mini-batch Update 
+    parser.add_argument('--ent_coef', type = float, default = 0) # Entropy coefficient for Entropy Regularization 
+    parser.add_argument('--target_kl', type = float, default = 0.02) # KL Divergence threshold 
+    parser.add_argument('--max_grad_norm', type = float, default = 0.5) # Gradient Clipping threshold 
 	# for Swimmer-v1 and HalfCheetah-v1 use shift = 0
     # for Hopper-v1, Walker2d-v1, and Ant-v1 use shift = 1
     # for Humanoid-v1 used shift = 5
-    parser.add_argument('--shift', type=float, default=1) #TODO: tweak as necessary
+    parser.add_argument('--shift', type=float, default=0) #TODO: tweak as necessary
     parser.add_argument('--seed', type = int) #random seed	
     
     #utility arguments
