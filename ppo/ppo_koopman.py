@@ -481,17 +481,23 @@ def get_state_pos_and_vel_idx(task_name):
     
 	#TODO: put in the hardcoded values
     if task_name == 'Swimmer':
-        pass
+        state_pos_idx = np.r_[1:3]
+        state_vel_idx = np.r_[6:8]
     elif task_name == 'Hopper':
-        pass
+        state_pos_idx = np.r_[2:5]
+        state_vel_idx = np.r_[8:11]
     elif task_name == 'HalfCheetah':
-        pass
+        state_pos_idx = np.r_[2:8]
+        state_vel_idx = np.r_[11:17]
     elif task_name == 'Walker2D':
-        pass
+        state_pos_idx = np.r_[2:8]
+        state_vel_idx = np.r_[11:17]
     elif task_name == 'Ant':
-        pass
+        state_pos_idx = np.r_[5:13]
+        state_vel_idx = np.r_[19:27]
     elif task_name == 'Humanoid':
-        pass
+        state_pos_idx = np.r_[6, 5, 7 : 22]
+        state_vel_idx = np.r_[29, 28, 30 : 45]
 
     return state_pos_idx, state_vel_idx
 
