@@ -20,6 +20,7 @@ from torch.optim import Adam
 from torch.distributions import MultivariateNormal
 
 import os
+import logz
 from ppo_policies import KoopmanNetworkPolicy, NNPolicy
 from ARS.Observables import LocomotionObservableTorch
 
@@ -67,6 +68,8 @@ class PPO:
 
         # This logger will help us with printing out summaries of each iteration
         self.logger = {
+            'start_time': 0,
+            'total_time': 0,
             'delta_t': time.time_ns(),
             't_so_far': 0,          # timesteps so far
             'i_so_far': 0,          # iterations so far
@@ -75,6 +78,7 @@ class PPO:
             'actor_losses': [],     # losses of actor network in current iteration
             'lr': 0,
         }
+
     def learn(self, total_timesteps):
         """
             Train the actor and critic networks. Here is where the main PPO algorithm resides.
@@ -87,6 +91,7 @@ class PPO:
         """
         print(f"Learning... Running {self.max_timesteps_per_episode} timesteps per episode, ", end='')
         print(f"{self.timesteps_per_batch} timesteps per batch for a total of {total_timesteps} timesteps")
+        self.logger['start_time'] = time.time()
         t_so_far = 0 # Timesteps simulated so far
         i_so_far = 0 # Iterations ran so far
         while t_so_far < total_timesteps:                                                                       # ALG STEP 2
@@ -195,13 +200,18 @@ class PPO:
             avg_loss = sum(loss) / len(loss)
             self.logger['actor_losses'].append(avg_loss)
 
-            # Print a summary of our training so far
+            # Log a summary of our training so far
             self._log_summary()
 
-            # Save our model if it's time
-            if i_so_far % self.save_freq == 0:
-                torch.save(self.actor.state_dict(), './ppo_actor.pth')
-                torch.save(self.critic.state_dict(), './ppo_critic.pth')
+            # evaluation
+            if i_so_far % self.eval_freq == 0:
+                #TODO - run num_eval_rollouts and log reward data
+                #TODO - set up running num_eval_rollouts rollouts 
+
+                #save the actor and critic networks
+                torch.save(self.actor.state_dict(), os.path.join(self.log_dir, 'ppo_actor.pth'))
+                torch.save(self.critic.state_dict(), os.path.join(self.log_dir, '/ppo_critic.pth'))
+
 
     def calculate_gae(self, rewards, values, dones):
         batch_advantages = []  # List to store computed advantages for each timestep
@@ -232,7 +242,7 @@ class PPO:
         return torch.tensor(batch_advantages, dtype=torch.float)
 
 
-    def rollout(self):
+    def rollout(self, eval = False):
        
         batch_obs = []
         batch_acts = []
@@ -274,19 +284,24 @@ class PPO:
 
                 # Calculate action and make a step in the env. 
                 # Note that rew is short for reward.
-                action, log_prob = self.get_action(obs)
+                action, log_prob = self.get_action(obs, eval = eval)
                 val = self.critic(obs)
 
-                obs, rew, done, _ = self.env.step(action)
-                rew -= self.shift
+                obs, rews, dones, _ = self.env.step(action)
+
+                #we only shift the reward if this is not an eval rollout (shifting is only meant to help with training)
+                if not eval:
+                    rews -= self.shift
+
                 # Track recent reward, action, and action log probability
-                ep_rews.append(rew)
+                ep_rews.append(rews)
                 ep_vals.append(val.flatten())
                 batch_acts.append(action)
                 batch_log_probs.append(log_prob)
 
-                # If the environment tells us the episode is terminated, break
-                if done:
+                #TODO - verify that this is the behavior we want
+                # If the environment tells us ALL episodes are done, break
+                if np.all(dones):
                     break
 
             # Track episodic lengths, rewards, state values, and done flags
@@ -304,14 +319,15 @@ class PPO:
         self.logger['batch_lens'] = batch_lens
 
         # Here, we return the batch_rews instead of batch_rtgs for later calculation of GAE
-        return batch_obs, batch_acts, batch_log_probs, batch_rews, batch_lens, batch_vals,batch_dones
+        return batch_obs, batch_acts, batch_log_probs, batch_rews, batch_lens, batch_vals, batch_dones
 
-    def get_action(self, obs):
+    def get_action(self, obs, eval = False):
         """
             Queries an action from the actor network, should be called from rollout.
 
             Parameters:
                 obs - the observation at the current timestep
+                eval - whether or not this should be an eval timestep. If eval, don't sample noise.
 
             Return:
                 action - the action to take, as a numpy array
@@ -320,6 +336,11 @@ class PPO:
         # Query the actor network for a mean action
         obs = torch.tensor(obs,dtype=torch.float)
         mean = self.actor(obs)
+
+        # If we're testing, just return the deterministic action. Sampling should only be for training as our "exploration" factor.
+        # Moved this before sampling to make code efficient
+        if eval or self.deterministic:
+            return mean.detach().numpy(), 1
 
         # Create a distribution with the mean action and std from the covariance matrix above.
         # For more information on how this distribution works, check out Andrew Ng's lecture on it:
@@ -332,10 +353,6 @@ class PPO:
         # Calculate the log probability for that action
         log_prob = dist.log_prob(action)
 
-        # If we're testing, just return the deterministic action. Sampling should only be for training
-        # as our "exploration" factor.
-        if self.deterministic:
-            return mean.detach().numpy(), 1
 
         # Return the sampled action and the log probability of that action in our distribution
         return action.detach().numpy(), log_prob.detach()
@@ -398,10 +415,13 @@ class PPO:
 
         # Miscellaneous parameters
         self.render = False                             # If we should render during rollout
-        self.save_freq = 10                             # How often we save in number of iterations
+        self.eval_freq = 10                             # How often we save in number of iterations
         self.deterministic = False                      # If we're testing, don't sample actions
         self.seed = None								# Sets the seed of our program, used for reproducibility of results
         self.shift = 0                                  # Shifts the reward in a direction during training to dissaude learning policies that do nothing (from ARS)
+
+        self.log_dir = 'data'                           # The directory to save this run's logs, models, and figures to
+        self.num_eval_rollouts = 100                    # The number of evaluation rollouts to use 
 
         # Change any default values to custom values for specified hyperparameters
         for param, val in hyperparameters.items():
@@ -434,6 +454,10 @@ class PPO:
         delta_t = (self.logger['delta_t'] - delta_t) / 1e9
         delta_t = str(round(delta_t, 2))
 
+        curr_t = time.time()
+        elapsed_time = curr_t - self.logger['start_time']
+        self.logger['total_time'] = elapsed_time
+
         t_so_far = self.logger['t_so_far']
         i_so_far = self.logger['i_so_far']
         lr = self.logger['lr']
@@ -442,21 +466,21 @@ class PPO:
         avg_actor_loss = np.mean([losses.float().mean() for losses in self.logger['actor_losses']])
 
         # Round decimal places for more aesthetic logging messages
-        avg_ep_lens = str(round(avg_ep_lens, 2))
-        avg_ep_rews = str(round(avg_ep_rews, 2))
+        avg_ep_lens = str(round(avg_ep_lens, 5))
+        avg_ep_rews = str(round(avg_ep_rews, 5))
         avg_actor_loss = str(round(avg_actor_loss, 5))
 
-        # Print logging statements
-        print(flush=True)
-        print(f"-------------------- Iteration #{i_so_far} --------------------", flush=True)
-        print(f"Average Episodic Length: {avg_ep_lens}", flush=True)
-        print(f"Average Episodic Return: {avg_ep_rews}", flush=True)
-        print(f"Average Loss: {avg_actor_loss}", flush=True)
-        print(f"Timesteps So Far: {t_so_far}", flush=True)
-        print(f"Iteration took: {delta_t} secs", flush=True)
-        print(f"Learning rate: {lr}", flush=True)
-        print(f"------------------------------------------------------", flush=True)
-        print(flush=True)
+        # Log data
+        print("----------------")
+        print("Iteration ", i_so_far)
+        print("Elapsed Time ", elapsed_time)
+        print("Average Episodic Length ", avg_ep_lens)
+        print("Average Episodic Rewards ", avg_ep_rews)
+        print("Average Actor Loss ", avg_actor_loss)
+        print("Current Elapsed Timesteps ", t_so_far)
+        print("Iteration Time (secs) ", delta_t)
+        print("Learning Rate ", lr)
+        print("----------------", flush = True)
 
         # Reset batch-specific logging data
         self.logger['batch_lens'] = []
@@ -519,6 +543,9 @@ def run_ppo(params):
     print(f"Logging to directory {logdir}")
     os.makedirs(logdir)
 
+    logz.configure_output_dir(logdir)
+    logz.save_params(params)
+
     #set up ppo hyperparameters
     ppo_hyperparameters = {
         'timesteps_per_batch': params.timesteps_per_batch,
@@ -533,7 +560,9 @@ def run_ppo(params):
         'target_kl': params.target_kl,
         'max_grad_norm': params.max_grad_norm, 
         'shift': params.shift,
-        'seed': params.seed
+        'seed': params.seed,
+        'log_dir': params.dir_path,
+        'num_eval_rollouts': params.num_eval_rollouts
     }
     
     #set up parallel environments
@@ -585,8 +614,9 @@ if __name__ == '__main__':
 	# for Swimmer-v1 and HalfCheetah-v1 use shift = 0
     # for Hopper-v1, Walker2d-v1, and Ant-v1 use shift = 1
     # for Humanoid-v1 used shift = 5
-    parser.add_argument('--shift', type=float, default=0) #TODO: tweak as necessary
+    parser.add_argument('--shift', type=float, default = 0) #TODO: tweak as necessary
     parser.add_argument('--seed', type = int) #random seed	
+    parser.add_argument('--num_eval_rollouts', type = int, default = 100) #the number of environment rollouts to perform during evaluation. probably leave it at 100 for consistency
 
     #PD controller params - adding for flexibility but probably won't change at all
     parser.add_argument('--PDctrl_P', type = float, default = 0.1)
@@ -596,10 +626,16 @@ if __name__ == '__main__':
     parser.add_argument('--dir_path', type=str, default='data') #the folder to save runs to
     parser.add_argument('--params_path', type = str)
     parser.add_argument('--policy_checkpoint_path', type = str)
-    parser.add_argument('--filter_checkpoint_path', type = str)
     parser.add_argument('--run_name', type = str)
 
     args = parser.parse_args()
     params = vars(args)
+
+    if args.params_path is not None:
+        import json
+        params = json.load(open(args.params_path, 'r'))
+        # print(params)
+        if args.run_name:
+            params['run_name'] = args.run_name
 
     run_ppo(params)
