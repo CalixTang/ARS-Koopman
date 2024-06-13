@@ -20,7 +20,8 @@ from torch.optim import Adam
 from torch.distributions import MultivariateNormal
 
 import os
-
+from ppo_policies import KoopmanNetworkPolicy, NNPolicy
+from ARS.Observables import LocomotionObservableTorch
 
 class PPO:
     """
@@ -254,7 +255,7 @@ class PPO:
             ep_vals = [] # state values collected per episode
             ep_dones = [] # done flag collected per episode
             # Reset the environment. Note that obs is short for observation. 
-            obs, _ = self.env.reset()
+            obs = self.env.reset()
             # Initially, the game is not done
             done = False
 
@@ -276,8 +277,8 @@ class PPO:
                 action, log_prob = self.get_action(obs)
                 val = self.critic(obs)
 
-                obs, rew, terminated, truncated, _ = self.env.step(action)
-                done = terminated or truncated
+                obs, rew, done, _ = self.env.step(action)
+                rew -= self.shift
                 # Track recent reward, action, and action log probability
                 ep_rews.append(rew)
                 ep_vals.append(val.flatten())
@@ -476,6 +477,7 @@ def get_state_pos_and_vel_idx(task_name):
             
     '''
     task_name = task_name.split('-')[0] #remove the v[x] 
+    state_pos_idx, state_vel_idx = None, None
     
 	#TODO: put in the hardcoded values
     if task_name == 'Swimmer':
@@ -490,6 +492,8 @@ def get_state_pos_and_vel_idx(task_name):
         pass
     elif task_name == 'Humanoid':
         pass
+
+    return state_pos_idx, state_vel_idx
 
 
 def run_ppo(params):
@@ -508,7 +512,8 @@ def run_ppo(params):
             logdir = os.path.join(dir_path, str(time.time_ns()))
     print(f"Logging to directory {logdir}")
     os.makedirs(logdir)
-    
+
+    #set up ppo hyperparameters
     ppo_hyperparameters = {
         'timesteps_per_batch': params.timesteps_per_batch,
         'max_timesteps_per_episode': params.max_timesetps_per_episode,
@@ -525,23 +530,23 @@ def run_ppo(params):
         'seed': params.seed
     }
     
+    #set up parallel environments
+    envs = gym.vector.make(params.task_id, num_envs = params.num_envs)
 
-	#TODO: set up vectorized environments and a dummy single env for getting obs and ac dim
-    env = None
 
-    #TODO: parse and instantiate actor network 
-    #sub-TODO: find and define the state pos and state vel idx mappings used for mujoco tasks
-    actor = None
+    #set up actor network (Koopman Policy)
+    act_dim, obs_dim = envs.action_space.shape[-1], envs.observation_space.shape[-1]
+    state_pos_idx, state_vel_idx = get_state_pos_and_vel_idx(params.task_id)
+    actor = KoopmanNetworkPolicy(obs_dim, act_dim, LocomotionObservableTorch, state_pos_idx, state_vel_idx, params.PDctrl_P, params.PDctrl_D)
     
-	#TODO: instantiate critic network (unless we need to experiment, I don't see why a 64-64 mlp critic won't work)
-    critic = None
+	#set up critic network (obs -> val)
+    critic = NNPolicy(obs_dim, 1)
 
-	#TODO: instantiate PPO object with default hyperparams
-    ppo = PPO(actor, critic, env, ppo_hyperparameters)
+	#instantitate ppo object with params
+    ppo = PPO(actor, critic, envs, ppo_hyperparameters)
     
 	#TODO: parse number of timesteps to run and train ppo
-    total_timesteps = 0
-    ppo.learn(total_timesteps)
+    ppo.learn(params.total_timesteps)
     
 	#TODO: save koopman policy weights, actor and critic networks as pytorch models, and any relevant figures
 
@@ -552,10 +557,11 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     #basic arguments
-    parser.add_argument('--task_id', type=str, default='Hopper-v2') #any mujoco env v4
+    parser.add_argument('--task_id', type=str, default='Swimmer-v4') #any mujoco env v4
     
 
 	#PPO arguments
+    parser.add_argument('--total_timesteps', type = int, default = 1e8) #number of total timesteps to allot to ppo
     parser.add_argument('--num_envs', type = int, default = 5) #number of parallel environments
     #I'm going to use reward shift like ARS does because it seems useful for training
     parser.add_argument('--timesteps_per_batch', type = int, default = 4800) # Number of timesteps to run per batch
@@ -575,6 +581,10 @@ if __name__ == '__main__':
     # for Humanoid-v1 used shift = 5
     parser.add_argument('--shift', type=float, default=0) #TODO: tweak as necessary
     parser.add_argument('--seed', type = int) #random seed	
+
+    #PD controller params - adding for flexibility but probably won't change at all
+    parser.add_argument('--PDctrl_P', type = float, default = 0.1)
+    parser.add_argument('--PDctrl_D', type = float, default = 0.001)
     
     #utility arguments
     parser.add_argument('--dir_path', type=str, default='data') #the folder to save runs to
