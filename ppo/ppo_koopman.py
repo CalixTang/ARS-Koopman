@@ -220,7 +220,12 @@ class PPO:
 
                 #batch rews, batch_vals, and batch_dones are List[List[Tensor(num_envs)]] - list of (episodes as a list of (timestep -> tensor[num_envs]))
                 
-                #TODO - use helper func to translate batch rews
+                #use helper func to translate batch rews to ep rews
+                ep_rews = self.conv_batch_rews_to_ep_rews(batch_rews)
+                mean_rew, std_rew, min_rew, max_rew = ep_rews.mean(), ep_rews.std(), ep_rews.min(), ep_rews.max()
+
+                #TODO log progress and metric values
+
 
                 #save the actor and critic networks
                 torch.save(self.actor.state_dict(), os.path.join(self.log_dir, 'ppo_actor.pth'))
@@ -331,7 +336,7 @@ class PPO:
 
                 obs, rews, dones, _ = env.step(action)
 
-                #we only shift the reward if this is not an eval rollout (shifting is only meant to help with training)
+                #important - only shift the reward if this is not an eval rollout (shifting is only meant to help with training)
                 if not eval:
                     rews -= self.shift
 
@@ -341,7 +346,6 @@ class PPO:
                 batch_acts.append(action)
                 batch_log_probs.append(log_prob)
 
-                #TODO - verify that this is the behavior we want
                 # If the environment tells us ALL episodes are done, break
                 if np.all(dones):
                     break
@@ -550,7 +554,7 @@ def get_state_pos_and_vel_idx(task_name):
     task_name = task_name.split('-')[0] #remove the v[x] 
     state_pos_idx, state_vel_idx = None, None
     
-	#TODO: put in the hardcoded values
+	#Relevant docs for mujoco tasks - https://www.gymlibrary.dev/environments/mujoco/
     if task_name == 'Swimmer':
         state_pos_idx = np.r_[1:3]
         state_vel_idx = np.r_[6:8]
