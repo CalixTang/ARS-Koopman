@@ -20,6 +20,7 @@ from torch.optim import Adam
 from torch.distributions import MultivariateNormal
 
 import os
+#check if the dependency on logz (in ARS package) is what we want
 import logz
 from ppo_policies import KoopmanNetworkPolicy, NNPolicy
 from ARS.Observables import LocomotionObservableTorch
@@ -28,31 +29,40 @@ class PPO:
     """
         This is the PPO class we will use as our model in main.py
     """
-    def __init__(self, actor, critic, env, **hyperparameters):
+    def __init__(self, actor, critic, task_id, **hyperparameters):
         """
             Initializes the PPO model, including hyperparameters.
 
             Parameters:
                 actor - the actor policy in an actor-critic setup
                 critic - the critic policy in an actor-critic setup
-                env - the environment to train on.
+                task_id - the id of the task_id for env
                 hyperparameters - all extra arguments passed into PPO that should be hyperparameters.
 
             Returns:
                 None
         """
+        #dummy env 
+        dummy_env = gym.make(task_id)
+
         # Make sure the environment is compatible with our code
-        assert(type(env.observation_space) == gym.spaces.Box)
-        assert(type(env.action_space) == gym.spaces.Box)
+        assert(type(dummy_env.observation_space) == gym.spaces.Box)
+        assert(type(dummy_env.action_space) == gym.spaces.Box)
         
         # Initialize hyperparameters for training with PPO
         self._init_hyperparameters(hyperparameters)
 
-        # Extract environment information
-        self.env = env
+        # Extract environment information        
+        self.obs_dim = dummy_env.observation_space.shape[0]
+        self.act_dim = dummy_env.action_space.shape[0]
+
+        # Initialize actual envs
+        self.env = gym.vector.make(self.task_id, num_envs = self.num_envs)
+        self.eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts)
         
-        self.obs_dim = env.observation_space.shape[0]
-        self.act_dim = env.action_space.shape[0]
+        #TODO - check if this works
+        self.env.seed(self.seed)
+        self.eval_env.seed(self.seed)
 
         # Initialize actor and critic networks
         self.actor = actor                                                 # ALG STEP 1
@@ -63,7 +73,7 @@ class PPO:
         self.critic_optim = Adam(self.critic.parameters(), lr=self.lr)
 
         # Initialize the covariance matrix used to query the actor for actions
-        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
+        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.1) #originally 0.5 
         self.cov_mat = torch.diag(self.cov_var)
 
         # This logger will help us with printing out summaries of each iteration
@@ -206,13 +216,29 @@ class PPO:
             # evaluation
             if i_so_far % self.eval_freq == 0:
                 #TODO - run num_eval_rollouts and log reward data
-                #TODO - set up running num_eval_rollouts rollouts 
+                batch_obs, batch_acts, batch_log_probs, batch_rews, batch_lens, batch_vals, batch_dones = self.rollout(eval = True)
+
+                #batch rews, batch_vals, and batch_dones are List[List[Tensor(num_envs)]] - list of (episodes as a list of (timestep -> tensor[num_envs]))
+                
+                #TODO - use helper func to translate batch rews
 
                 #save the actor and critic networks
                 torch.save(self.actor.state_dict(), os.path.join(self.log_dir, 'ppo_actor.pth'))
-                torch.save(self.critic.state_dict(), os.path.join(self.log_dir, '/ppo_critic.pth'))
+                torch.save(self.critic.state_dict(), os.path.join(self.log_dir, 'ppo_critic.pth'))
 
 
+    def conv_batch_rews_to_ep_rews(self, batch_rews):
+        '''
+            Convert batch_rews List[List[tensor(num_envs)]] to tensor(episodes, num_envs) with cumulative reward per episode
+
+            Parameters
+                batch_rews - a List[List[tensor(num_envs)]] containing rewards at each episode at each timestep for each parallel environment.
+            Returns
+                ep_rews - a tensor(episodes, num_envs) containing cumulative reward per episode for each parallel environment.
+        '''
+        #TODO implement
+        pass
+    
     def calculate_gae(self, rewards, values, dones):
         batch_advantages = []  # List to store computed advantages for each timestep
 
@@ -235,11 +261,19 @@ class PPO:
                 last_advantage = advantage  # Update the last advantage for the next timestep
                 advantages.insert(0, advantage)  # Insert advantage at the beginning of the list
 
+            #turn advantages into the proper shape used in indexing during training
+            advantages = torch.cat(advantages, axis = 0)
+
             # Extend the batch_advantages list with advantages computed for the current episode
             batch_advantages.extend(advantages)
 
+        # This formulation seems wrong... Eps might have variable lens TODO verify
         # Convert the batch_advantages list to a PyTorch tensor of type float
-        return torch.tensor(batch_advantages, dtype=torch.float)
+        # return torch.tensor(batch_advantages, dtype=torch.float)
+
+        # Convert batch_adv list to a (total T * num_envs, 1) tensor of type float
+        batch_advantages = torch.cat(batch_advantages, axis = 0)
+        return batch_advantages
 
 
     def rollout(self, eval = False):
@@ -259,35 +293,43 @@ class PPO:
         ep_dones = []
         t = 0 # Keeps track of how many timesteps we've run so far this batch
 
+        #choose timestep cap for training vs eval (force only running 1 episode per env during eval)
+        timestep_cap = self.timesteps_per_batch if not eval else 1
+
         # Keep simulating until we've run more than or equal to specified timesteps per batch
-        while t < self.timesteps_per_batch:
+        while t < timestep_cap:
+
+            #choose the correct env to use for rollouts
+            env = self.env if not eval else self.eval_env
+
             ep_rews = [] # rewards collected per episode
             ep_vals = [] # state values collected per episode
             ep_dones = [] # done flag collected per episode
             # Reset the environment. Note that obs is short for observation. 
-            obs = self.env.reset()
-            # Initially, the game is not done
-            done = False
+            obs = env.reset()
+            # Initially, envs are not done
+            dones = torch.zeros((self.num_envs if not eval else self.num_eval_rollouts, ), dtype = torch.bool)
 
             # Run an episode for a maximum of max_timesteps_per_episode timesteps
             for ep_t in range(self.max_timesteps_per_episode):
                 # If render is specified, render the environment
                 if self.render:
-                    self.env.render()
-                # Track done flag of the current state
-                ep_dones.append(done)
+                    env.render()
 
                 t += 1 # Increment timesteps ran this batch so far
 
                 # Track observations in this batch
                 batch_obs.append(obs)
 
+                # Track done flags for all envs
+                ep_dones.append(dones)
+
                 # Calculate action and make a step in the env. 
                 # Note that rew is short for reward.
                 action, log_prob = self.get_action(obs, eval = eval)
-                val = self.critic(obs)
+                val = self.critic(obs) if not eval else [] #just to save some time in eval
 
-                obs, rews, dones, _ = self.env.step(action)
+                obs, rews, dones, _ = env.step(action)
 
                 #we only shift the reward if this is not an eval rollout (shifting is only meant to help with training)
                 if not eval:
@@ -309,14 +351,16 @@ class PPO:
             batch_rews.append(ep_rews)
             batch_vals.append(ep_vals)
             batch_dones.append(ep_dones)
-        # Reshape data as tensors in the shape specified in function description, before returning
-        batch_obs = torch.tensor(batch_obs, dtype=torch.float)
-        batch_acts = torch.tensor(batch_acts, dtype=torch.float)
-        batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float).flatten()
+
+        # Reshape data as tensors
+        batch_obs = torch.cat(batch_obs, axis = 0) #(total timesteps, obs dim)
+        batch_acts = torch.cat(batch_acts, axis = 0) #(total timesteps, act dim)
+        batch_log_probs = torch.cat(batch_log_probs, axis = 0) # (total timesteps, 1?)
 
         # Log the episodic returns and episodic lengths in this batch.
-        self.logger['batch_rews'] = batch_rews
-        self.logger['batch_lens'] = batch_lens
+        if not eval:
+            self.logger['batch_rews'] = batch_rews
+            self.logger['batch_lens'] = batch_lens
 
         # Here, we return the batch_rews instead of batch_rtgs for later calculation of GAE
         return batch_obs, batch_acts, batch_log_probs, batch_rews, batch_lens, batch_vals, batch_dones
@@ -421,6 +465,7 @@ class PPO:
         self.shift = 0                                  # Shifts the reward in a direction during training to dissaude learning policies that do nothing (from ARS)
 
         self.log_dir = 'data'                           # The directory to save this run's logs, models, and figures to
+        self.num_envs = 1                               # The number of environments for training
         self.num_eval_rollouts = 100                    # The number of evaluation rollouts to use 
 
         # Change any default values to custom values for specified hyperparameters
@@ -449,6 +494,8 @@ class PPO:
         # Calculate logging values. I use a few python shortcuts to calculate each value
         # without explaining since it's not too important to PPO; feel free to look it over,
         # and if you have any questions you can email me (look at bottom of README)
+
+        #TODO: verify that the math in here actually calculates what we think it does
         delta_t = self.logger['delta_t']
         self.logger['delta_t'] = time.time_ns()
         delta_t = (self.logger['delta_t'] - delta_t) / 1e9
@@ -562,15 +609,16 @@ def run_ppo(params):
         'shift': params.shift,
         'seed': params.seed,
         'log_dir': params.dir_path,
+        'task_id': params.task_id,
+        'num_envs': params.num_envs,
         'num_eval_rollouts': params.num_eval_rollouts
     }
     
-    #set up parallel environments
-    envs = gym.vector.make(params.task_id, num_envs = params.num_envs)
-
+    #set up dummy environment to extract shape info
+    env = gym.make(params.task_id)
 
     #set up actor network (Koopman Policy)
-    act_dim, obs_dim = envs.action_space.shape[-1], envs.observation_space.shape[-1]
+    act_dim, obs_dim = env.action_space.shape[0], env.observation_space.shape[0]
     state_pos_idx, state_vel_idx = get_state_pos_and_vel_idx(params.task_id)
     actor = KoopmanNetworkPolicy(obs_dim, act_dim, LocomotionObservableTorch, state_pos_idx, state_vel_idx, params.PDctrl_P, params.PDctrl_D)
     
@@ -578,7 +626,7 @@ def run_ppo(params):
     critic = NNPolicy(obs_dim, 1)
 
 	#instantitate ppo object with params
-    ppo = PPO(actor, critic, envs, ppo_hyperparameters)
+    ppo = PPO(actor, critic, params.task_id, ppo_hyperparameters)
     
 	#TODO: parse number of timesteps to run and train ppo
     ppo.learn(params.total_timesteps)
@@ -600,7 +648,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_envs', type = int, default = 5) #number of parallel environments
     #I'm going to use reward shift like ARS does because it seems useful for training
     parser.add_argument('--timesteps_per_batch', type = int, default = 4800) # Number of timesteps to run per batch
-    parser.add_argument('--max_timesteps_per_episode', type = int, default = 1000) # Max number of timesteps per episode
+    parser.add_argument('--max_timesteps_per_episode', type = int, default = 1000) # Max number of timesteps per episode (max rollout length)
     parser.add_argument('--n_updates_per_iteration', type = int, default = 5) # Number of times to update actor/critic per iteration
     parser.add_argument('--ppo_lr', type = float, default = 5e-3) #LR for actor
     parser.add_argument('--ppo_gamma', type = float, default = 0.95) #reward discount factor
