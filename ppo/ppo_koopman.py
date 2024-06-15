@@ -23,7 +23,7 @@ import os
 #check if the dependency on logz (in ARS package) is what we want
 import logz
 from ppo_policies import KoopmanNetworkPolicy, NNPolicy
-from ARS.Observables import LocomotionObservableTorch
+from torch_observables import LocomotionObservableTorch
 
 class PPO:
     """
@@ -241,8 +241,15 @@ class PPO:
             Returns
                 ep_rews - a tensor(episodes, num_envs) containing cumulative reward per episode for each parallel environment.
         '''
-        #TODO implement
-        pass
+        ep_rews = torch.zeros((len(batch_rews), batch_rews[0][0].shape[0]))
+        for i in range(len(batch_rews)):
+            #episode rewards (time dim, env dim)
+            episode = batch_rews[i]
+            episode = torch.cat(episode, axis = 0)
+            ep_rews[i, :] = episode.sum(axis = 0)
+
+        return ep_rews
+
     
     def calculate_gae(self, rewards, values, dones):
         batch_advantages = []  # List to store computed advantages for each timestep
