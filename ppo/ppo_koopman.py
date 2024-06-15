@@ -215,7 +215,6 @@ class PPO:
 
             # evaluation
             if i_so_far % self.eval_freq == 0:
-                #TODO - run num_eval_rollouts and log reward data
                 batch_obs, batch_acts, batch_log_probs, batch_rews, batch_lens, batch_vals, batch_dones = self.rollout(eval = True)
 
                 #batch rews, batch_vals, and batch_dones are List[List[Tensor(num_envs)]] - list of (episodes as a list of (timestep -> tensor[num_envs]))
@@ -225,6 +224,15 @@ class PPO:
                 mean_rew, std_rew, min_rew, max_rew = ep_rews.mean(), ep_rews.std(), ep_rews.min(), ep_rews.max()
 
                 #TODO log progress and metric values
+
+                logz.log_tabular("Time", time.time() - self.logger['start_time'])
+                logz.log_tabular("Iteration", i_so_far)
+                logz.log_tabular("AverageReward", mean_rew)
+                logz.log_tabular("StdRewards", std_rew)
+                logz.log_tabular("MaxRewardRollout", max_rew)
+                logz.log_tabular("MinRewardRollout", min_rew)
+                logz.log_tabular("timesteps", t_so_far)
+                logz.dump_tabular()
 
 
                 #save the actor and critic networks
@@ -520,7 +528,8 @@ class PPO:
         i_so_far = self.logger['i_so_far']
         lr = self.logger['lr']
         avg_ep_lens = np.mean(self.logger['batch_lens'])
-        avg_ep_rews = np.mean([np.sum(ep_rews) for ep_rews in self.logger['batch_rews']])
+        ep_rews = self.conv_batch_rews_to_ep_rews(self.logger['batch_rews'])
+        avg_ep_rews, std_ep_rews, max_ep_rews, min_ep_rews = ep_rews.mean(), ep_rews.std(), ep_rews.max(), ep_rews.min()
         avg_actor_loss = np.mean([losses.float().mean() for losses in self.logger['actor_losses']])
 
         # Round decimal places for more aesthetic logging messages
@@ -534,6 +543,9 @@ class PPO:
         print("Elapsed Time ", elapsed_time)
         print("Average Episodic Length ", avg_ep_lens)
         print("Average Episodic Rewards ", avg_ep_rews)
+        print("Standard Deviation of Episodic Rewards ", std_ep_rews)
+        print("Max Episodic Reward ", max_ep_rews)
+        print("Min Episodic Reward ", min_ep_rews)
         print("Average Actor Loss ", avg_actor_loss)
         print("Current Elapsed Timesteps ", t_so_far)
         print("Iteration Time (secs) ", delta_t)
