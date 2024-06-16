@@ -104,6 +104,11 @@ class PPO:
         self.logger['start_time'] = time.time()
         t_so_far = 0 # Timesteps simulated so far
         i_so_far = 0 # Iterations ran so far
+
+        best_mean_rew, best_koopman_mat = float('-inf'), None
+        train_ep_rew = []
+        eval_ep_rew = []
+
         while t_so_far < total_timesteps:                                                                       # ALG STEP 2
             # Autobots, roll out (just kidding, we're collecting our batch simulations here)
             batch_obs, batch_acts, batch_log_probs, batch_rews, batch_lens, batch_vals, batch_dones = self.rollout()                     # ALG STEP 3
@@ -213,6 +218,13 @@ class PPO:
             # Log a summary of our training so far
             self._log_summary()
 
+            # add to training rew
+            ep_rews = self.conv_batch_rews_to_ep_rews(self.logger['batch_rews'])
+            train_ep_rew.append(ep_rews)
+            if train_ep_rew.mean() > best_mean_rew:
+                best_mean_rew = train_ep_rew.mean()
+                best_koopman_mat = self.actor.get_koopman_matrix()
+
             # evaluation
             if i_so_far % self.eval_freq == 0:
                 batch_obs, batch_acts, batch_log_probs, batch_rews, batch_lens, batch_vals, batch_dones = self.rollout(eval = True)
@@ -222,8 +234,9 @@ class PPO:
                 #use helper func to translate batch rews to ep rews
                 ep_rews = self.conv_batch_rews_to_ep_rews(batch_rews)
                 mean_rew, std_rew, min_rew, max_rew = ep_rews.mean(), ep_rews.std(), ep_rews.min(), ep_rews.max()
-
-                #TODO log progress and metric values
+                
+                #save ep rewards
+                eval_ep_rew.append(ep_rews)
 
                 logz.log_tabular("Time", time.time() - self.logger['start_time'])
                 logz.log_tabular("Iteration", i_so_far)
@@ -238,6 +251,16 @@ class PPO:
                 #save the actor and critic networks
                 torch.save(self.actor.state_dict(), os.path.join(self.log_dir, 'ppo_actor.pth'))
                 torch.save(self.critic.state_dict(), os.path.join(self.log_dir, 'ppo_critic.pth'))
+                np.save(os.path.join(self.log_dir, "latest_koopman_matrix.npy"), self.actor.get_koopman_matrix())
+
+        # save all ep rewards
+        train_ep_rew = torch.cat(train_ep_rew, axis = 0).detach().numpy()
+        eval_ep_rew = torch.cat(eval_ep_rew, axis = 0).detach().numpy()
+        np.save(os.path.join(self.log_dir, "train_rewards.npy"), train_ep_rew)
+        np.save(os.path.join(self.log_dir, "eval_rewards.npy"), train_ep_rew)
+
+        #save best koopman mat
+        np.save(os.path.join(self.log_dir, "best_koopman_matrix.npy"), best_koopman_mat)
 
 
     def conv_batch_rews_to_ep_rews(self, batch_rews):
@@ -540,6 +563,7 @@ class PPO:
         # Log data
         print("----------------")
         print("Iteration ", i_so_far)
+        print("Number of Episodes", torch.numel(ep_rews))
         print("Elapsed Time ", elapsed_time)
         print("Average Episodic Length ", avg_ep_lens)
         print("Average Episodic Rewards ", avg_ep_rews)
@@ -651,7 +675,7 @@ def run_ppo(params):
 	#instantitate ppo object with params
     ppo = PPO(actor, critic, params.task_id, ppo_hyperparameters)
     
-	#TODO: parse number of timesteps to run and train ppo
+	#run ppo learn
     ppo.learn(params.total_timesteps)
     
 	#TODO: save koopman policy weights, actor and critic networks as pytorch models, and any relevant figures
