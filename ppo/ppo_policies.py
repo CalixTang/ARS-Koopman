@@ -27,7 +27,7 @@ class KoopmanNetworkPolicy(torch.nn.Module):
 		self.lifted_dim = self.observable.compute_observables_from_self()
 		
 		#(truncated) koopman matrix. of size [A, D]. We do not want a bias term.
-		self.koopman_layer = torch.nn.Linear(self.lifted_dim, self.obs_dim, bias = False)
+		self.koopman_layer = torch.nn.Linear(self.lifted_dim, self.obs_dim, bias = False, dtype = torch.float32)
 
 		#TODO - figure out if this initialization is necessary or useful
 		#initialize koopman layer's weights to identity instead of the default Linear random init b/c of koopman update
@@ -44,6 +44,10 @@ class KoopmanNetworkPolicy(torch.nn.Module):
 		"""
 			Implements a forward pass of the policy. For the Koopman policy, turns an env observation into an action
 		"""
+
+		# Convert observation to tensor if it's a numpy array
+		if isinstance(obs, np.ndarray):
+			obs = torch.tensor(obs, dtype=torch.float32)
 
 		#1) lift observable to lifted state (R^M -> R^D)
 		z = self.observable.z(obs)
@@ -87,8 +91,8 @@ class PDControlLayer(torch.nn.Module):
 		self.state_pos_idx, self.state_vel_idx = state_pos_idx, state_vel_idx
 		self.P, self.D = P, D
 
-		self.pos_extract_layer = torch.nn.Linear(obs_dim, act_dim, bias = False)
-		self.vel_extract_layer = torch.nn.Linear(obs_dim, act_dim, bias = False)
+		self.pos_extract_layer = torch.nn.Linear(obs_dim, act_dim, bias = False, dtype = torch.float32)
+		self.vel_extract_layer = torch.nn.Linear(obs_dim, act_dim, bias = False, dtype = torch.float32)
 
 		self.setup_extract_layers()
 
@@ -101,8 +105,8 @@ class PDControlLayer(torch.nn.Module):
 		'''
 
 		with torch.no_grad():
-			self.pos_extract_layer.weight.copy_(torch.nn.Parameter(torch.zeros_like(self.pos_extract_layer.weight)))
-			self.vel_extract_layer.weight.copy_(torch.nn.Parameter(torch.zeros_like(self.vel_extract_layer.weight)))
+			self.pos_extract_layer.weight.copy_(torch.nn.Parameter(torch.zeros_like(self.pos_extract_layer.weight, dtype = torch.float32)))
+			self.vel_extract_layer.weight.copy_(torch.nn.Parameter(torch.zeros_like(self.vel_extract_layer.weight, dtype = torch.float32)))
 
 			#TODO: find a better way to do this - I couldn't figure out if it's possible to set a bunch of elements inline if they're not a contiguous slice
 			for i in range(self.state_pos_idx.shape[0]):
@@ -117,6 +121,11 @@ class PDControlLayer(torch.nn.Module):
 				obs - The full current observation. Of shape (obs_dim, )
 				next_state - The full next state. Of shape (obs_dim, )
 		'''
+		# Convert observation to tensor if it's a numpy array
+		if isinstance(obs, np.ndarray):
+			obs = torch.tensor(obs, dtype=torch.float32)
+		if isinstance(next_state, np.ndarray):
+			next_state = torch.tensor(next_state, dtype=torch.float32)
 		#extract curr pos, vel, and setpoint
 		pos = self.pos_extract_layer(obs)
 		vel = self.vel_extract_layer(obs)
@@ -170,8 +179,8 @@ class NNPolicy(torch.nn.Module):
 		"""
 		# Convert observation to tensor if it's a numpy array
 		if isinstance(obs, np.ndarray):
-			obs = torch.tensor(obs, dtype=torch.float)
-
+			obs = torch.tensor(obs, dtype=torch.float32)
+		
 		activation1 = F.relu(self.layer1(obs))
 		activation2 = F.relu(self.layer2(activation1))
 		output = self.layer3(activation2)

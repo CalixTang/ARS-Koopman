@@ -20,8 +20,11 @@ from torch.optim import Adam
 from torch.distributions import MultivariateNormal
 
 import os
+
 #check if the dependency on logz (in ARS package) is what we want
-import logz
+from ARS import logz
+from ARS.graph_results import graph_training_and_eval_rewards
+
 from ppo_policies import KoopmanNetworkPolicy, NNPolicy
 from torch_observables import LocomotionObservableTorch
 
@@ -29,7 +32,7 @@ class PPO:
     """
         This is the PPO class we will use as our model in main.py
     """
-    def __init__(self, actor, critic, task_id, **hyperparameters):
+    def __init__(self, actor, critic, task_id, hyperparameters):
         """
             Initializes the PPO model, including hyperparameters.
 
@@ -42,8 +45,9 @@ class PPO:
             Returns:
                 None
         """
+        self.task_id = task_id
         #dummy env 
-        dummy_env = gym.make(task_id)
+        dummy_env = gym.make(self.task_id)
 
         # Make sure the environment is compatible with our code
         assert(type(dummy_env.observation_space) == gym.spaces.Box)
@@ -51,6 +55,8 @@ class PPO:
         
         # Initialize hyperparameters for training with PPO
         self._init_hyperparameters(hyperparameters)
+
+        logz.configure_output_dir(self.log_dir)
 
         # Extract environment information        
         self.obs_dim = dummy_env.observation_space.shape[0]
@@ -61,8 +67,8 @@ class PPO:
         self.eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts)
         
         #TODO - check if this works
-        self.env.seed(self.seed)
-        self.eval_env.seed(self.seed)
+        self.env.reset(seed = self.seed)
+        self.eval_env.reset(seed = self.seed)
 
         # Initialize actor and critic networks
         self.actor = actor                                                 # ALG STEP 1
@@ -73,7 +79,7 @@ class PPO:
         self.critic_optim = Adam(self.critic.parameters(), lr=self.lr)
 
         # Initialize the covariance matrix used to query the actor for actions
-        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.1) #originally 0.5 
+        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.1, dtype = torch.float32) #originally 0.5 
         self.cov_mat = torch.diag(self.cov_var)
 
         # This logger will help us with printing out summaries of each iteration
@@ -112,14 +118,13 @@ class PPO:
         while t_so_far < total_timesteps:                                                                       # ALG STEP 2
             # Autobots, roll out (just kidding, we're collecting our batch simulations here)
             batch_obs, batch_acts, batch_log_probs, batch_rews, batch_lens, batch_vals, batch_dones = self.rollout()                     # ALG STEP 3
-            
             # Calculate advantage using GAE
             A_k = self.calculate_gae(batch_rews, batch_vals, batch_dones) 
             V = self.critic(batch_obs).squeeze()
             batch_rtgs = A_k + V.detach()   
             
             # Calculate how many timesteps we collected this batch
-            t_so_far += np.sum(batch_lens)
+            t_so_far += batch_lens.sum()
 
             # Increment the number of iterations
             i_so_far += 1
@@ -219,10 +224,10 @@ class PPO:
             self._log_summary()
 
             # add to training rew
-            ep_rews = self.conv_batch_rews_to_ep_rews(self.logger['batch_rews'])
+            ep_rews = self.conv_batch_rews_to_ep_rews(batch_rews)
             train_ep_rew.append(ep_rews)
-            if train_ep_rew.mean() > best_mean_rew:
-                best_mean_rew = train_ep_rew.mean()
+            if ep_rews.mean() > best_mean_rew:
+                best_mean_rew = ep_rews.mean()
                 best_koopman_mat = self.actor.get_koopman_matrix()
 
             # evaluation
@@ -232,7 +237,7 @@ class PPO:
                 #batch rews, batch_vals, and batch_dones are List[List[Tensor(num_envs)]] - list of (episodes as a list of (timestep -> tensor[num_envs]))
                 
                 #use helper func to translate batch rews to ep rews
-                ep_rews = self.conv_batch_rews_to_ep_rews(batch_rews)
+                ep_rews = self.conv_batch_rews_to_ep_rews(batch_rews).detach()
                 mean_rew, std_rew, min_rew, max_rew = ep_rews.mean(), ep_rews.std(), ep_rews.min(), ep_rews.max()
                 
                 #save ep rewards
@@ -254,10 +259,12 @@ class PPO:
                 np.save(os.path.join(self.log_dir, "latest_koopman_matrix.npy"), self.actor.get_koopman_matrix())
 
         # save all ep rewards
-        train_ep_rew = torch.cat(train_ep_rew, axis = 0).detach().numpy()
-        eval_ep_rew = torch.cat(eval_ep_rew, axis = 0).detach().numpy()
+        train_ep_rew = torch.cat(train_ep_rew, axis = 0).squeeze().detach().numpy()
+        eval_ep_rew = torch.stack(eval_ep_rew, axis = 0).squeeze().detach().numpy()
         np.save(os.path.join(self.log_dir, "train_rewards.npy"), train_ep_rew)
-        np.save(os.path.join(self.log_dir, "eval_rewards.npy"), train_ep_rew)
+        np.save(os.path.join(self.log_dir, "eval_rewards.npy"), eval_ep_rew)
+
+        graph_training_and_eval_rewards(train_ep_rew, eval_ep_rew, self.log_dir, False)
 
         #save best koopman mat
         np.save(os.path.join(self.log_dir, "best_koopman_matrix.npy"), best_koopman_mat)
@@ -276,7 +283,7 @@ class PPO:
         for i in range(len(batch_rews)):
             #episode rewards (time dim, env dim)
             episode = batch_rews[i]
-            episode = torch.cat(episode, axis = 0)
+            episode = torch.stack(episode, axis = 0)
             ep_rews[i, :] = episode.sum(axis = 0)
 
         return ep_rews
@@ -315,7 +322,7 @@ class PPO:
         # return torch.tensor(batch_advantages, dtype=torch.float)
 
         # Convert batch_adv list to a (total T * num_envs, 1) tensor of type float
-        batch_advantages = torch.cat(batch_advantages, axis = 0)
+        batch_advantages = torch.tensor(batch_advantages, dtype = torch.float32)
         return batch_advantages
 
 
@@ -338,6 +345,7 @@ class PPO:
 
         #choose timestep cap for training vs eval (force only running 1 episode per env during eval)
         timestep_cap = self.timesteps_per_batch if not eval else 1
+        num_envs = self.num_envs if not eval else self.num_eval_rollouts
 
         # Keep simulating until we've run more than or equal to specified timesteps per batch
         while t < timestep_cap:
@@ -349,9 +357,10 @@ class PPO:
             ep_vals = [] # state values collected per episode
             ep_dones = [] # done flag collected per episode
             # Reset the environment. Note that obs is short for observation. 
-            obs = env.reset()
+            obs, _ = env.reset()
+            obs = torch.from_numpy(obs).float()
             # Initially, envs are not done
-            dones = torch.zeros((self.num_envs if not eval else self.num_eval_rollouts, ), dtype = torch.bool)
+            dones = torch.zeros((self.num_envs if not eval else self.num_eval_rollouts, )).float()
 
             # Run an episode for a maximum of max_timesteps_per_episode timesteps
             for ep_t in range(self.max_timesteps_per_episode):
@@ -359,7 +368,7 @@ class PPO:
                 if self.render:
                     env.render()
 
-                t += 1 # Increment timesteps ran this batch so far
+                t += num_envs # Increment timesteps ran this batch so far
 
                 # Track observations in this batch
                 batch_obs.append(obs)
@@ -370,9 +379,10 @@ class PPO:
                 # Calculate action and make a step in the env. 
                 # Note that rew is short for reward.
                 action, log_prob = self.get_action(obs, eval = eval)
-                val = self.critic(obs) if not eval else [] #just to save some time in eval
+                val = self.critic(obs) if not eval else np.zeros((1,)) #just to save some time in eval
 
-                obs, rews, dones, _ = env.step(action)
+                obs, rews, dones, terminateds, infos = env.step(action)
+                obs, rews, dones, terminateds = torch.from_numpy(obs).float(), torch.from_numpy(rews).float(), torch.from_numpy(dones).float(), torch.from_numpy(terminateds)
 
                 #important - only shift the reward if this is not an eval rollout (shifting is only meant to help with training)
                 if not eval:
@@ -381,19 +391,20 @@ class PPO:
                 # Track recent reward, action, and action log probability
                 ep_rews.append(rews)
                 ep_vals.append(val.flatten())
-                batch_acts.append(action)
+                batch_acts.append(torch.from_numpy(action).float())
                 batch_log_probs.append(log_prob)
 
                 # If the environment tells us ALL episodes are done, break
-                if np.all(dones):
+                if torch.all(dones) or torch.all(terminateds):
                     break
 
             # Track episodic lengths, rewards, state values, and done flags
-            batch_lens.append(ep_t + 1)
+            batch_lens.append((ep_t + 1) * torch.ones((num_envs, )))
             batch_rews.append(ep_rews)
             batch_vals.append(ep_vals)
             batch_dones.append(ep_dones)
 
+        batch_lens = torch.stack(batch_lens, axis = 0)
         # Reshape data as tensors
         batch_obs = torch.cat(batch_obs, axis = 0) #(total timesteps, obs dim)
         batch_acts = torch.cat(batch_acts, axis = 0) #(total timesteps, act dim)
@@ -420,13 +431,12 @@ class PPO:
                 log_prob - the log probability of the selected action in the distribution
         """
         # Query the actor network for a mean action
-        obs = torch.tensor(obs,dtype=torch.float)
         mean = self.actor(obs)
 
         # If we're testing, just return the deterministic action. Sampling should only be for training as our "exploration" factor.
         # Moved this before sampling to make code efficient
         if eval or self.deterministic:
-            return mean.detach().numpy(), 1
+            return mean.detach().numpy(), torch.tensor([1.])
 
         # Create a distribution with the mean action and std from the covariance matrix above.
         # For more information on how this distribution works, check out Andrew Ng's lecture on it:
@@ -486,33 +496,30 @@ class PPO:
         """
         # Initialize default values for hyperparameters
         # Algorithm hyperparameters
-        self.timesteps_per_batch = 4800                 # Number of timesteps to run per batch
-        self.max_timesteps_per_episode = 1600           # Max number of timesteps per episode
-        self.n_updates_per_iteration = 5                # Number of times to update actor/critic per iteration
-        self.lr = 0.005                                 # Learning rate of actor optimizer
-        self.gamma = 0.95                               # Discount factor to be applied when calculating Rewards-To-Go
-        self.clip = 0.2                                 # Recommended 0.2, helps define the threshold to clip the ratio during SGA
-        self.lam = 0.98                                 # Lambda Parameter for GAE 
-        self.num_minibatches = 6                        # Number of mini-batches for Mini-batch Update
-        self.ent_coef = 0                               # Entropy coefficient for Entropy Regularization
-        self.target_kl = 0.02                           # KL Divergence threshold
-        self.max_grad_norm = 0.5                        # Gradient Clipping threshold
+        self.timesteps_per_batch = hyperparameters.get('timesteps_per_batch', 4800)                 # Number of timesteps to run per batch
+        self.max_timesteps_per_episode = hyperparameters.get('max_timesteps_per_episode', 1600)           # Max number of timesteps per episode
+        self.n_updates_per_iteration = hyperparameters.get('n_updates_per_iteration', 5)                # Number of times to update actor/critic per iteration
+        self.lr = hyperparameters.get('lr', 0.005)                                 # Learning rate of actor optimizer
+        self.gamma = hyperparameters.get('gamma', 0.95)                               # Discount factor to be applied when calculating Rewards-To-Go
+        self.clip = hyperparameters.get('clip', 0.2)                                 # Recommended 0.2, helps define the threshold to clip the ratio during SGA
+        self.lam = hyperparameters.get('lam', 0.98)                                 # Lambda Parameter for GAE 
+        self.num_minibatches = hyperparameters.get('num_minibatches', 6)                        # Number of mini-batches for Mini-batch Update
+        self.ent_coef = hyperparameters.get('ent_coef', 0)                               # Entropy coefficient for Entropy Regularization
+        self.target_kl = hyperparameters.get('target_kl', 0.02)                           # KL Divergence threshold
+        self.max_grad_norm = hyperparameters.get('max_grad_norm', 0.5)                        # Gradient Clipping threshold
 
 
         # Miscellaneous parameters
-        self.render = False                             # If we should render during rollout
-        self.eval_freq = 10                             # How often we save in number of iterations
-        self.deterministic = False                      # If we're testing, don't sample actions
-        self.seed = None								# Sets the seed of our program, used for reproducibility of results
-        self.shift = 0                                  # Shifts the reward in a direction during training to dissaude learning policies that do nothing (from ARS)
+        self.render = hyperparameters.get('render', False)                             # If we should render during rollout
+        self.eval_freq = hyperparameters.get('eval_freq', 10)                             # How often we save in number of iterations
+        self.deterministic = hyperparameters.get('deterministic', False)                      # If we're testing, don't sample actions
+        self.seed = hyperparameters.get('seed', None)								# Sets the seed of our program, used for reproducibility of results
+        self.shift = hyperparameters.get('shift', 0)                                  # Shifts the reward in a direction during training to dissaude learning policies that do nothing (from ARS)
 
-        self.log_dir = 'data'                           # The directory to save this run's logs, models, and figures to
-        self.num_envs = 1                               # The number of environments for training
-        self.num_eval_rollouts = 100                    # The number of evaluation rollouts to use 
+        self.log_dir = hyperparameters.get('log_dir', 'data')                           # The directory to save this run's logs, models, and figures to
+        self.num_envs = hyperparameters.get('num_envs', 1)                               # The number of environments for training
+        self.num_eval_rollouts = hyperparameters.get('num_eval_rollouts', 100)                    # The number of evaluation rollouts to use 
 
-        # Change any default values to custom values for specified hyperparameters
-        for param, val in hyperparameters.items():
-            exec('self.' + param + ' = ' + str(val))
         
         # Sets the seed if specified
         if self.seed != None:
@@ -550,15 +557,15 @@ class PPO:
         t_so_far = self.logger['t_so_far']
         i_so_far = self.logger['i_so_far']
         lr = self.logger['lr']
-        avg_ep_lens = np.mean(self.logger['batch_lens'])
-        ep_rews = self.conv_batch_rews_to_ep_rews(self.logger['batch_rews'])
+        avg_ep_lens = (self.logger['batch_lens'].mean())
+        ep_rews = self.conv_batch_rews_to_ep_rews(self.logger['batch_rews']).detach()
         avg_ep_rews, std_ep_rews, max_ep_rews, min_ep_rews = ep_rews.mean(), ep_rews.std(), ep_rews.max(), ep_rews.min()
         avg_actor_loss = np.mean([losses.float().mean() for losses in self.logger['actor_losses']])
 
         # Round decimal places for more aesthetic logging messages
-        avg_ep_lens = str(round(avg_ep_lens, 5))
-        avg_ep_rews = str(round(avg_ep_rews, 5))
-        avg_actor_loss = str(round(avg_actor_loss, 5))
+        # avg_ep_lens = str(round(avg_ep_lens, 5))
+        # avg_ep_rews = str(round(avg_ep_rews, 5))
+        # avg_actor_loss = str(round(avg_actor_loss, 5))
 
         # Log data
         print("----------------")
@@ -621,6 +628,7 @@ def get_state_pos_and_vel_idx(task_name):
 
 
 def run_ppo(params):
+    print("Parameters: ", params)
     
     #set up logging directory
     dir_path = params['dir_path']
@@ -642,41 +650,41 @@ def run_ppo(params):
 
     #set up ppo hyperparameters
     ppo_hyperparameters = {
-        'timesteps_per_batch': params.timesteps_per_batch,
-        'max_timesteps_per_episode': params.max_timesetps_per_episode,
-        'n_updates_per_iteration': params.n_updates_per_iteration,
-        'lr': params.ppo_lr,
-        'gamma': params.ppo_gamma,
-        'clip': params.clip, 
-        'lam': params.lam, 
-        'num_minibatches': params.num_minibatches,
-        'ent_coef': params.ent_coef,
-        'target_kl': params.target_kl,
-        'max_grad_norm': params.max_grad_norm, 
-        'shift': params.shift,
-        'seed': params.seed,
-        'log_dir': params.dir_path,
-        'task_id': params.task_id,
-        'num_envs': params.num_envs,
-        'num_eval_rollouts': params.num_eval_rollouts
+        'timesteps_per_batch': params['timesteps_per_batch'],
+        'max_timesteps_per_episode': params['max_timesteps_per_episode'],
+        'n_updates_per_iteration': params['n_updates_per_iteration'],
+        'lr': params['ppo_lr'],
+        'gamma': params['ppo_gamma'],
+        'clip': params['clip'], 
+        'lam': params['lam'], 
+        'num_minibatches': params['num_minibatches'],
+        'ent_coef': params['ent_coef'],
+        'target_kl': params['target_kl'],
+        'max_grad_norm': params['max_grad_norm'], 
+        'shift': params['shift'],
+        'seed': params['seed'],
+        'log_dir': logdir,
+        'task_id': params['task_id'],
+        'num_envs': params['num_envs'],
+        'num_eval_rollouts': params['num_eval_rollouts']
     }
     
     #set up dummy environment to extract shape info
-    env = gym.make(params.task_id)
+    env = gym.make(params['task_id'])
 
     #set up actor network (Koopman Policy)
     act_dim, obs_dim = env.action_space.shape[0], env.observation_space.shape[0]
-    state_pos_idx, state_vel_idx = get_state_pos_and_vel_idx(params.task_id)
-    actor = KoopmanNetworkPolicy(obs_dim, act_dim, LocomotionObservableTorch, state_pos_idx, state_vel_idx, params.PDctrl_P, params.PDctrl_D)
+    state_pos_idx, state_vel_idx = get_state_pos_and_vel_idx(params['task_id'])
+    actor = KoopmanNetworkPolicy(obs_dim, act_dim, LocomotionObservableTorch, state_pos_idx, state_vel_idx, params['PDctrl_P'], params['PDctrl_D'])
     
 	#set up critic network (obs -> val)
     critic = NNPolicy(obs_dim, 1)
 
 	#instantitate ppo object with params
-    ppo = PPO(actor, critic, params.task_id, ppo_hyperparameters)
+    ppo = PPO(actor, critic, params['task_id'], ppo_hyperparameters)
     
 	#run ppo learn
-    ppo.learn(params.total_timesteps)
+    ppo.learn(params['total_timesteps'])
     
 	#TODO: save koopman policy weights, actor and critic networks as pytorch models, and any relevant figures
 
@@ -694,7 +702,7 @@ if __name__ == '__main__':
     parser.add_argument('--total_timesteps', type = int, default = 1e8) #number of total timesteps to allot to ppo
     parser.add_argument('--num_envs', type = int, default = 5) #number of parallel environments
     #I'm going to use reward shift like ARS does because it seems useful for training
-    parser.add_argument('--timesteps_per_batch', type = int, default = 4800) # Number of timesteps to run per batch
+    parser.add_argument('--timesteps_per_batch', type = int, default = 5000) # Number of timesteps to run per batch
     parser.add_argument('--max_timesteps_per_episode', type = int, default = 1000) # Max number of timesteps per episode (max rollout length)
     parser.add_argument('--n_updates_per_iteration', type = int, default = 5) # Number of times to update actor/critic per iteration
     parser.add_argument('--ppo_lr', type = float, default = 5e-3) #LR for actor
@@ -719,7 +727,7 @@ if __name__ == '__main__':
     
     #utility arguments
     parser.add_argument('--dir_path', type=str, default='data') #the folder to save runs to
-    parser.add_argument('--params_path', type = str)
+    parser.add_argument('--params_path', type = str, default = None)
     parser.add_argument('--policy_checkpoint_path', type = str)
     parser.add_argument('--run_name', type = str)
 

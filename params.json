@@ -12,8 +12,8 @@
 "policy_type"	:	"truncatedhumanoid",
 "reward_threshold"	:	Infinity,
 "rollout_length"	:	1000,
-"run_name"	:	"humanoid-arstk-1",
+"run_name"	:	"humanoid-arstk-4",
 "seed"	:	237,
 "shift"	:	5,
 "step_size"	:	0.1,
-"task_id"	:	"Humanoid-v1"}
+"task_id"	:	"Humanoid-v4"}
