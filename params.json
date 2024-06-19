@@ -10,10 +10,10 @@
 "params_path"	:	null,
 "policy_checkpoint_path"	:	null,
 "policy_type"	:	"truncatedhumanoid",
-"reward_threshold"	:	Infinity,
+"reward_threshold"	:	6000,
 "rollout_length"	:	1000,
 "run_name"	:	"humanoid-arstk-4",
 "seed"	:	237,
 "shift"	:	5,
 "step_size"	:	0.1,
-"task_id"	:	"Humanoid-v4"}
+"task_id"	:	"Humanoid-v1"}
