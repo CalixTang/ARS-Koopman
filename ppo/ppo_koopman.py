@@ -614,7 +614,7 @@ def get_state_pos_and_vel_idx(task_name):
     elif task_name == 'HalfCheetah':
         state_pos_idx = np.r_[2:8]
         state_vel_idx = np.r_[11:17]
-    elif task_name == 'Walker2D':
+    elif task_name == 'Walker2d':
         state_pos_idx = np.r_[2:8]
         state_vel_idx = np.r_[11:17]
     elif task_name == 'Ant':
