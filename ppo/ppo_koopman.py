@@ -9,7 +9,8 @@ this PPO2 implementation is taken from https://github.com/ericyangyu/PPO-for-Beg
             It can be found here: https://spinningup.openai.com/en/latest/_images/math/e62a8971472597f4b014c2da064f636ffe365ba3.svg
 """
 
-import gym
+# import gym
+import gymnasium as gym #allow importing robosuite
 import time
 
 import numpy as np
@@ -32,7 +33,7 @@ class PPO:
     """
         This is the PPO class we will use as our model in main.py
     """
-    def __init__(self, actor, critic, task_id, hyperparameters):
+    def __init__(self, actor, critic, task_id, hyperparameters, extra_env_params = dict()):
         """
             Initializes the PPO model, including hyperparameters.
 
@@ -41,7 +42,7 @@ class PPO:
                 critic - the critic policy in an actor-critic setup
                 task_id - the id of the task_id for env
                 hyperparameters - all extra arguments passed into PPO that should be hyperparameters.
-
+                extra_env_params - extra parameters passed into environments. by default, none
             Returns:
                 None
         """
@@ -50,7 +51,8 @@ class PPO:
         dummy_env = gym.make(self.task_id)
 
         # Make sure the environment is compatible with our code
-        assert(type(dummy_env.observation_space) == gym.spaces.Box)
+        # assert(type(dummy_env.observation_space) == gym.spaces.Box)
+        assert(type(dummy_env.observation_space) == gym.spaces.Box or isinstance(dummy_env.observation_space, gym.spaces.dict.Dict))
         assert(type(dummy_env.action_space) == gym.spaces.Box)
         
         # Initialize hyperparameters for training with PPO
@@ -58,17 +60,15 @@ class PPO:
 
         logz.configure_output_dir(self.log_dir)
 
-        # Extract environment information        
-        self.obs_dim = dummy_env.observation_space.shape[0]
+        # Extract environment information      
+        if isinstance(dummy_env.observation_space, gym.spaces.dict.Dict):
+            self.obs_dim = sum([v.shape[0] for k, v in dummy_env.observation_space.items()])
+        else:   
+            self.obs_dim = dummy_env.observation_space.shape[0]
         self.act_dim = dummy_env.action_space.shape[0]
 
         # Initialize actual envs
-        self.env = gym.vector.make(self.task_id, num_envs = self.num_envs)
-        self.eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts)
-        
-        #TODO - check if this works
-        self.env.reset(seed = self.seed)
-        self.eval_env.reset(seed = self.seed)
+        self.env, self.eval_env = self.instantiate_gym_envs(extra_env_params)
 
         # Initialize actor and critic networks
         self.actor = actor                                                 # ALG STEP 1
@@ -358,6 +358,13 @@ class PPO:
             ep_dones = [] # done flag collected per episode
             # Reset the environment. Note that obs is short for observation. 
             obs, _ = env.reset()
+
+            if isinstance(obs, dict):
+                # robosuite envs typically return observations as a dict with robot obs, and then state obs that include object information. we need object info, so we will concatenate everything together to get the actual state
+
+                #as of python 3.7, dicts maintain order in order of elem insertion, so this should be fine
+                obs = np.concatenate([v for k, v in obs.items()], axis = -1)
+
             obs = torch.from_numpy(obs).float()
             # Initially, envs are not done
             dones = torch.zeros((self.num_envs if not eval else self.num_eval_rollouts, )).float()
@@ -381,7 +388,11 @@ class PPO:
                 action, log_prob = self.get_action(obs, eval = eval)
                 val = self.critic(obs) if not eval else np.zeros((1,)) #just to save some time in eval
 
-                obs, rews, dones, terminateds, infos = env.step(action)
+                obs, rews, terminateds, dones, infos = env.step(action)
+
+                if isinstance(obs, dict):
+                    obs = np.concatenate([v for k, v in obs.items()], axis = -1)
+                
                 obs, rews, dones, terminateds = torch.from_numpy(obs).float(), torch.from_numpy(rews).float(), torch.from_numpy(dones).float(), torch.from_numpy(terminateds)
 
                 #important - only shift the reward if this is not an eval rollout (shifting is only meant to help with training)
@@ -530,6 +541,28 @@ class PPO:
             torch.manual_seed(self.seed)
             print(f"Successfully set seed to {self.seed}")
 
+    def instantiate_gym_envs(self, extra_params):
+        """
+        Helper function to instantiate gym environments. Mainly handles different env hyperparameters from different env suites.
+        """
+        task_name = self.task_id.split('-')[0]
+
+        if task_name == 'FrankaKitchen':
+            pass
+        elif 'Fetch' in task_name:
+            pass
+        elif 'HandManipulate' in task_name:
+            env = gym.vector.make(self.task_id, num_envs = self.num_envs, max_episode_steps = extra_params['max_timesteps_per_episode'],  reward_type = extra_params['reward_type'])
+            eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts, max_episode_steps = extra_params['max_timesteps_per_episode'],  reward_type = extra_params['reward_type'] )
+        else:
+            env = gym.vector.make(self.task_id, num_envs = self.num_envs)
+            eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts)
+            
+        env.reset(seed = self.seed)
+        eval_env.reset(seed = self.seed)
+
+        return env, eval_env
+
     def _log_summary(self):
         """
             Print to stdout what we've logged so far in the most recent batch.
@@ -623,8 +656,36 @@ def get_state_pos_and_vel_idx(task_name):
     elif task_name == 'Humanoid':
         state_pos_idx = np.r_[6, 5, 7 : 22]
         state_vel_idx = np.r_[29, 28, 30 : 45]
+    elif task_name == 'FrankaKitchen':
+        # https://robotics.farama.org/envs/franka_kitchen/franka_kitchen/
+        state_pos_idx = np.r_[0 : 9]
+        state_vel_idx = np.r_[9 : 18]
+    elif 'HandManipulate' in task_name:
+        # https://robotics.farama.org/envs/shadow_dexterous_hand/manipulate_egg/ - this applies to the rest of the handmanipulate tasks
+        state_pos_idx = np.r_[0 : 5, 6 : 9, 10 : 13, 14 : 18, 19 : 24]
+        state_vel_idx = np.r_[24 : 29, 30 : 33, 34 : 37, 38 : 42, 43 : 48]
+    else:
+        state_pos_idx = np.r_[:]
+        state_vel_idx = np.r_[:]
+    
 
     return state_pos_idx, state_vel_idx
+def handle_extra_params(params, extra_env_params):
+    """
+    A helper function used to extract relevant env hyperparams from all params parsed with ArgParse. 
+    Modifies extra_env_params in-place.
+    """
+
+    task_name = params['task_id'].split('-')[0]
+    if task_name == 'FrankaKitchen':
+        pass
+    elif 'Fetch' in task_name:
+        pass
+    elif 'HandManipulate' in task_name:
+        extra_env_params['max_timesteps_per_episode'] = params.get('max_timesteps_per_episode', 50)
+        extra_env_params['reward_type'] = params.get('reward_type', 'dense') #dense or sparse
+
+    return
 
 
 def run_ppo(params):
@@ -673,15 +734,23 @@ def run_ppo(params):
     env = gym.make(params['task_id'])
 
     #set up actor network (Koopman Policy)
-    act_dim, obs_dim = env.action_space.shape[0], env.observation_space.shape[0]
+    obs_dim = 0
+    if isinstance(env.observation_space, gym.spaces.dict.Dict):
+        obs_dim = sum([v.shape[0] for k, v in env.observation_space.items()])
+    else:
+        obs_dim = env.observation_space.shape[0]
+    act_dim = env.action_space.shape[0]
     state_pos_idx, state_vel_idx = get_state_pos_and_vel_idx(params['task_id'])
     actor = KoopmanNetworkPolicy(obs_dim, act_dim, LocomotionObservableTorch, state_pos_idx, state_vel_idx, params['PDctrl_P'], params['PDctrl_D'])
     
 	#set up critic network (obs -> val)
     critic = NNPolicy(obs_dim, 1)
 
+    extra_env_params = {}
+    handle_extra_params(params, extra_env_params)
+
 	#instantitate ppo object with params
-    ppo = PPO(actor, critic, params['task_id'], ppo_hyperparameters)
+    ppo = PPO(actor, critic, params['task_id'], ppo_hyperparameters, extra_env_params = extra_env_params)
     
 	#run ppo learn
     ppo.learn(params['total_timesteps'])
@@ -703,7 +772,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_envs', type = int, default = 5) #number of parallel environments
     #I'm going to use reward shift like ARS does because it seems useful for training
     parser.add_argument('--timesteps_per_batch', type = int, default = 5000) # Number of timesteps to run per batch
-    parser.add_argument('--max_timesteps_per_episode', type = int, default = 1000) # Max number of timesteps per episode (max rollout length)
+    parser.add_argument('--max_timesteps_per_episode', type = int, default = 1000) # Max number of timesteps per episode (max rollout length) - important: different env suites will have different normal values
     parser.add_argument('--n_updates_per_iteration', type = int, default = 5) # Number of times to update actor/critic per iteration
     parser.add_argument('--ppo_lr', type = float, default = 5e-3) #LR for actor
     parser.add_argument('--ppo_gamma', type = float, default = 0.95) #reward discount factor
@@ -730,6 +799,9 @@ if __name__ == '__main__':
     parser.add_argument('--params_path', type = str, default = None)
     parser.add_argument('--policy_checkpoint_path', type = str)
     parser.add_argument('--run_name', type = str)
+
+    #Robosuite env args
+    parser.add_argument('--reward_type', type = str, default = 'dense', choices=['sparse', 'dense']) #the type of reward for robosuite environments. doesn't work with all envs, mostly just the dexterous manipulation ones.
 
     args = parser.parse_args()
     params = vars(args)
