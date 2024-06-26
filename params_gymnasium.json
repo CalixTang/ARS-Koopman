@@ -1,4 +1,4 @@
-{"delta_std"	:	0.02,
+{"delta_std"	:	0.2,
 "deltas_used"	:	128,
 "dir_path"	:	"data",
 "filter"	:	"NoFilter",
@@ -14,8 +14,8 @@
 "reward_type": "dense",
 "reward_threshold"	:	0,
 "rollout_length"	:	50,
-"run_name"	:	"handmanipulate-block-arstk-2",
+"run_name"	:	"fetchreach-arstk-1",
 "seed"	:	237,
 "shift"	:	0,
-"step_size"	:	0.02,
-"task_id"	:	"HandManipulateBlock-v1"}
+"step_size"	:	0.05,
+"task_id"	:	"FetchReach-v2"}
