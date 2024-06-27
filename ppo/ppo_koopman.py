@@ -240,6 +240,10 @@ class PPO:
                 ep_rews = self.conv_batch_rews_to_ep_rews(batch_rews).detach()
                 mean_rew, std_rew, min_rew, max_rew = ep_rews.mean(), ep_rews.std(), ep_rews.min(), ep_rews.max()
                 
+                if i_so_far == 10:
+                    print("Episodic rewards: ", ep_rews)
+                    print("Batch rewards: ", batch_rews)
+
                 #save ep rewards
                 eval_ep_rew.append(ep_rews)
 
@@ -256,7 +260,7 @@ class PPO:
                 #save the actor and critic networks
                 torch.save(self.actor.state_dict(), os.path.join(self.log_dir, 'ppo_actor.pth'))
                 torch.save(self.critic.state_dict(), os.path.join(self.log_dir, 'ppo_critic.pth'))
-                np.save(os.path.join(self.log_dir, "latest_koopman_matrix.npy"), self.actor.get_koopman_matrix())
+                np.save(os.path.join(self.log_dir, "latest_koopman_policy_weights.npy"), self.actor.get_koopman_matrix())
 
         # save all ep rewards
         train_ep_rew = torch.cat(train_ep_rew, axis = 0).squeeze().detach().numpy()
@@ -267,7 +271,7 @@ class PPO:
         graph_training_and_eval_rewards(train_ep_rew, eval_ep_rew, self.log_dir, False)
 
         #save best koopman mat
-        np.save(os.path.join(self.log_dir, "best_koopman_matrix.npy"), best_koopman_mat)
+        np.save(os.path.join(self.log_dir, "best_koopman_policy_weights.npy"), best_koopman_mat)
 
 
     def conv_batch_rews_to_ep_rews(self, batch_rews):
@@ -391,7 +395,7 @@ class PPO:
                 obs, rews, terminateds, dones, infos = env.step(action)
 
                 if isinstance(obs, dict):
-                    obs = np.concatenate([v for k, v in obs.items()], axis = -1)
+                    obs = np.concatenate([obs['observation'], obs['achieved_goal'], obs['desired_goal']], axis = -1)
                 
                 obs, rews, dones, terminateds = torch.from_numpy(obs).float(), torch.from_numpy(rews).float(), torch.from_numpy(dones).float(), torch.from_numpy(terminateds)
 
@@ -550,7 +554,8 @@ class PPO:
         if task_name == 'FrankaKitchen':
             pass
         elif 'Fetch' in task_name:
-            pass
+            env = gym.vector.make(self.task_id, num_envs = self.num_envs, max_episode_steps = extra_params['max_timesteps_per_episode'],  reward_type = extra_params['reward_type'])
+            eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts, max_episode_steps = extra_params['max_timesteps_per_episode'],  reward_type = extra_params['reward_type'] )
         elif 'HandManipulate' in task_name:
             env = gym.vector.make(self.task_id, num_envs = self.num_envs, max_episode_steps = extra_params['max_timesteps_per_episode'],  reward_type = extra_params['reward_type'])
             eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts, max_episode_steps = extra_params['max_timesteps_per_episode'],  reward_type = extra_params['reward_type'] )
@@ -664,6 +669,14 @@ def get_state_pos_and_vel_idx(task_name):
         # https://robotics.farama.org/envs/shadow_dexterous_hand/manipulate_egg/ - this applies to the rest of the handmanipulate tasks
         state_pos_idx = np.r_[0 : 5, 6 : 9, 10 : 13, 14 : 18, 19 : 24]
         state_vel_idx = np.r_[24 : 29, 30 : 33, 34 : 37, 38 : 42, 43 : 48]
+    elif task_name == 'FetchReach':
+        # https://robotics.farama.org/envs/fetch/reach/
+        state_pos_idx = np.r_[0 : 4]
+        state_vel_idx = np.r_[5 : 9]        
+    elif 'Fetch' in task_name:
+        # https://robotics.farama.org/envs/fetch/
+        state_pos_idx = np.r_[0 : 3, 9]
+        state_vel_idx = np.r_[20 : 24]
     else:
         state_pos_idx = np.r_[:]
         state_vel_idx = np.r_[:]
@@ -680,7 +693,8 @@ def handle_extra_params(params, extra_env_params):
     if task_name == 'FrankaKitchen':
         pass
     elif 'Fetch' in task_name:
-        pass
+        extra_env_params['max_timesteps_per_episode'] = params.get('max_timesteps_per_episode', 50)
+        extra_env_params['reward_type'] = params.get('reward_type', 'dense') #dense or sparse
     elif 'HandManipulate' in task_name:
         extra_env_params['max_timesteps_per_episode'] = params.get('max_timesteps_per_episode', 50)
         extra_env_params['reward_type'] = params.get('reward_type', 'dense') #dense or sparse
