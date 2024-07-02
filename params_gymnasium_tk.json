@@ -17,5 +17,5 @@
 "run_name"	:	"fetchpush-arstk-1",
 "seed"	:	237,
 "shift"	:	0,
-"step_size"	:	0.05,
+"step_size"	:	0.01,
 "task_id"	:	"FetchPush-v2"}
