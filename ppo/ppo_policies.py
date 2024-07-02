@@ -5,7 +5,7 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 	
-class KoopmanNetworkPolicy(torch.nn.Module):
+class TruncatedKoopmanNetworkPolicy(torch.nn.Module):
 	def __init__(self, obs_dim, act_dim, observable_class, state_pos_idx, state_vel_idx, controller_P, controller_D):
 		"""
 			Initialize policy and set up params  
@@ -16,7 +16,7 @@ class KoopmanNetworkPolicy(torch.nn.Module):
 				controller_P - a PD controller's P gain
 				controller_D - a PD controller's D gain
 		"""
-		super(KoopmanNetworkPolicy, self).__init__()
+		super(TruncatedKoopmanNetworkPolicy, self).__init__()
 
 		self.obs_dim, self.act_dim = obs_dim, act_dim
 
@@ -26,7 +26,7 @@ class KoopmanNetworkPolicy(torch.nn.Module):
 		#size of the lifted state (D)
 		self.lifted_dim = self.observable.compute_observables_from_self()
 		
-		#(truncated) koopman matrix. of size [A, D]. We do not want a bias term.
+		#(truncated) koopman matrix. of size [M, D]. We do not want a bias term.
 		self.koopman_layer = torch.nn.Linear(self.lifted_dim, self.obs_dim, bias = False, dtype = torch.float32)
 
 		#TODO - figure out if this initialization is necessary or useful
@@ -68,6 +68,69 @@ class KoopmanNetworkPolicy(torch.nn.Module):
 		"""
 		return self.koopman_layer.weight.clone().detach()
 	
+
+class MinKoopmanNetworkPolicy(torch.nn.Module):
+	def __init__(self, obs_dim, act_dim, observable_class, state_pos_idx, state_vel_idx, controller_P, controller_D):
+		"""
+			Initialize policy and set up params  
+			Parameters
+				obs_dim - input dimensions as int (M)
+				act_dim - output dimensions as int (A)
+				observable_class - the observable class object containing the lifting function 
+				controller_P - a PD controller's P gain
+				controller_D - a PD controller's D gain
+		"""
+		super(MinKoopmanNetworkPolicy, self).__init__()
+
+		self.obs_dim, self.act_dim = obs_dim, act_dim
+
+		#instantiate observable (has lifting function)
+		self.observable = observable_class(obs_dim)
+		
+		#size of the lifted state (D)
+		self.lifted_dim = self.observable.compute_observables_from_self()
+		
+		#(truncated) koopman matrix. of size [A, D]. We do not want a bias term.
+		self.koopman_layer = torch.nn.Linear(self.lifted_dim, self.act_dim, bias = False, dtype = torch.float32)
+
+		#TODO - figure out if this initialization is necessary or useful
+		#initialize koopman layer's weights to identity instead of the default Linear random init b/c of koopman update
+		with torch.no_grad():
+			self.koopman_layer.weight.copy_(torch.nn.Parameter(torch.eye(self.act_dim, self.lifted_dim)))
+		
+		#PD control layer
+		self.PD_layer = PDControlLayer(self.obs_dim, self.act_dim, state_pos_idx, state_vel_idx, controller_P, controller_D)
+		#Important - we do not want to update the weights in the PD layer
+		for param in self.PD_layer.parameters():
+			param.requires_grad = False
+
+	def forward(self, obs):
+		"""
+			Implements a forward pass of the policy. For the Koopman policy, turns an env observation into an action
+		"""
+
+		if isinstance(obs, dict):
+            # gymnasium robotics envs typically return observations as a dict with robot obs, and then state obs that include object information. we need object info, so we will concatenate everything together to get the actual state
+			obs = np.concatenate([obs['observation'], obs['achieved_goal'], obs['desired_goal']], axis = -1)
+
+		# Convert observation to tensor if it's a numpy array
+		if isinstance(obs, np.ndarray):
+			obs = torch.tensor(obs, dtype=torch.float32)
+
+		#1) lift observable to lifted state (R^M -> R^D)
+		z = self.observable.z(obs)
+
+		#2) Use Koopman matrix (aka linear layer) to propagate lifted state to next state
+		x_prime = self.koopman_layer(z)
+
+		#3) Use PD control module to generate action - pass in curr obs and x_prime as setpoint
+		return self.PD_layer(obs, x_prime)
+	
+	def get_koopman_matrix(self):
+		"""
+			A getter func for the internal koopman matrix
+		"""
+		return self.koopman_layer.weight.clone().detach()
 
 """
 An implementation of a PD controller using nn.Module. This is so that we can perform gradient ascent with gradient flow through the PD controller. 
@@ -133,7 +196,11 @@ class PDControlLayer(torch.nn.Module):
 		#extract curr pos, vel, and setpoint
 		pos = self.pos_extract_layer(obs)
 		vel = self.vel_extract_layer(obs)
-		setpoint = self.pos_extract_layer(next_state)
+
+		if (next_state.shape[-1] == self.act_dim):
+			setpoint = next_state
+		else:
+			setpoint = self.pos_extract_layer(next_state)
 		
 		#proportional gain = kP * (setpoint - curr pos)
 		p_gain = self.P * (setpoint - pos)

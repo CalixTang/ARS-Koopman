@@ -26,7 +26,7 @@ import os
 from ARS import logz
 from ARS.graph_results import graph_training_and_eval_rewards
 
-from ppo_policies import KoopmanNetworkPolicy, NNPolicy
+from ppo_policies import TruncatedKoopmanNetworkPolicy, MinKoopmanNetworkPolicy, NNPolicy
 from torch_observables import LocomotionObservableTorch
 
 class PPO:
@@ -752,7 +752,7 @@ def run_ppo(params):
         obs_dim = env.observation_space.shape[0]
     act_dim = env.action_space.shape[0]
     state_pos_idx, state_vel_idx = get_state_pos_and_vel_idx(params['task_id'])
-    actor = KoopmanNetworkPolicy(obs_dim, act_dim, LocomotionObservableTorch, state_pos_idx, state_vel_idx, params['PDctrl_P'], params['PDctrl_D'])
+    actor = MinKoopmanNetworkPolicy(obs_dim, act_dim, LocomotionObservableTorch, state_pos_idx, state_vel_idx, params['PDctrl_P'], params['PDctrl_D'])
     
 	#set up critic network (obs -> val)
     critic = NNPolicy(obs_dim, 1)
