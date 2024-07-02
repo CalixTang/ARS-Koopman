@@ -1,3 +1,4 @@
 reports/*
 data/*
-*.pyc
+params/*
+**/__pycache__/
