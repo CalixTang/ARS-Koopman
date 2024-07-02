@@ -1,4 +1,5 @@
 #!/bin/sh
+conda init
 conda activate mjrl-env
 
 # python ARS/ARS/ars.py --params_path params_gymnasium.json --policy_type linear --run_name fetchpush-arsl-1 > reports/fetchpush-arsl-1.out
