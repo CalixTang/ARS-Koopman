@@ -45,6 +45,10 @@ class KoopmanNetworkPolicy(torch.nn.Module):
 			Implements a forward pass of the policy. For the Koopman policy, turns an env observation into an action
 		"""
 
+		if isinstance(obs, dict):
+            # gymnasium robotics envs typically return observations as a dict with robot obs, and then state obs that include object information. we need object info, so we will concatenate everything together to get the actual state
+			obs = np.concatenate([obs['observation'], obs['achieved_goal'], obs['desired_goal']], axis = -1)
+
 		# Convert observation to tensor if it's a numpy array
 		if isinstance(obs, np.ndarray):
 			obs = torch.tensor(obs, dtype=torch.float32)

@@ -14,7 +14,7 @@
 "reward_type": "dense",
 "reward_threshold"	:	0,
 "rollout_length"	:	50,
-"run_name"	:	"fetchpush-arsl-1",
+"run_name"	:	"fetchpush-arstk-1",
 "seed"	:	237,
 "shift"	:	0,
 "step_size"	:	0.05,

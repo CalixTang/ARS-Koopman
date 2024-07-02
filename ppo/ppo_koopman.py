@@ -79,7 +79,7 @@ class PPO:
         self.critic_optim = Adam(self.critic.parameters(), lr=self.lr)
 
         # Initialize the covariance matrix used to query the actor for actions
-        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.1, dtype = torch.float32) #originally 0.5 
+        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.2, dtype = torch.float32) #originally 0.5 
         self.cov_mat = torch.diag(self.cov_var)
 
         # This logger will help us with printing out summaries of each iteration
@@ -364,10 +364,7 @@ class PPO:
             obs, _ = env.reset()
 
             if isinstance(obs, dict):
-                # robosuite envs typically return observations as a dict with robot obs, and then state obs that include object information. we need object info, so we will concatenate everything together to get the actual state
-
-                #as of python 3.7, dicts maintain order in order of elem insertion, so this should be fine
-                obs = np.concatenate([v for k, v in obs.items()], axis = -1)
+               obs = np.concatenate([obs['observation'], obs['achieved_goal'], obs['desired_goal']], axis = -1)
 
             obs = torch.from_numpy(obs).float()
             # Initially, envs are not done
