@@ -29,13 +29,16 @@ class TruncatedKoopmanNetworkPolicy(torch.nn.Module):
 		#(truncated) koopman matrix. of size [M, D]. We do not want a bias term.
 		self.koopman_layer = torch.nn.Linear(self.lifted_dim, self.obs_dim, bias = False, dtype = torch.float32)
 
+		#state pos, state vel
+		self.state_pos_idx, self.state_vel_idx = state_pos_idx, state_vel_idx
+
 		#TODO - figure out if this initialization is necessary or useful
 		#initialize koopman layer's weights to identity instead of the default Linear random init b/c of koopman update
 		with torch.no_grad():
 			self.koopman_layer.weight.copy_(torch.nn.Parameter(torch.eye(self.obs_dim, self.lifted_dim)))
 		
 		#PD control layer
-		self.PD_layer = PDControlLayer(self.obs_dim, self.act_dim, state_pos_idx, state_vel_idx, controller_P, controller_D)
+		self.PD_layer = PDControlLayer(self.obs_dim, self.act_dim, self.state_pos_idx, self.state_vel_idx, controller_P, controller_D)
 		#Important - we do not want to update the weights in the PD layer
 		for param in self.PD_layer.parameters():
 			param.requires_grad = False
@@ -93,6 +96,9 @@ class MinKoopmanNetworkPolicy(torch.nn.Module):
 		#(truncated) koopman matrix. of size [A, D]. We do not want a bias term.
 		self.koopman_layer = torch.nn.Linear(self.lifted_dim, self.act_dim, bias = False, dtype = torch.float32)
 
+		#state pos, state vel
+		self.state_pos_idx, self.state_vel_idx = state_pos_idx, state_vel_idx
+
 		#initialize koopman layer's weights to stay at the same current position
 		with torch.no_grad():
 			self.koopman_layer.weight.copy_(torch.nn.Parameter(torch.zeros(self.act_dim, self.lifted_dim)))
@@ -101,7 +107,7 @@ class MinKoopmanNetworkPolicy(torch.nn.Module):
 				self.koopman_layer.weight[i, self.state_pos_idx[i]] = 1
 		
 		#PD control layer
-		self.PD_layer = PDControlLayer(self.obs_dim, self.act_dim, state_pos_idx, state_vel_idx, controller_P, controller_D)
+		self.PD_layer = PDControlLayer(self.obs_dim, self.act_dim, self.state_pos_idx, self.state_vel_idx, controller_P, controller_D)
 		#Important - we do not want to update the weights in the PD layer
 		for param in self.PD_layer.parameters():
 			param.requires_grad = False
