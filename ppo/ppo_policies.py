@@ -4,15 +4,23 @@ Contains policies used by PPO. We define a Koopman-based policy suitable for use
 import torch
 import torch.nn.functional as F
 import numpy as np
+import torch_observables
+
+def get_policy(policy_type, obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D):
+    if policy_type == 'truncatedkoopman':
+        return TruncatedKoopmanNetworkPolicy(obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D)
+    elif policy_type == 'minkoopman':
+        return MinKoopmanNetworkPolicy(obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D)
+    raise NotImplementedError
 	
 class TruncatedKoopmanNetworkPolicy(torch.nn.Module):
-	def __init__(self, obs_dim, act_dim, observable_class, state_pos_idx, state_vel_idx, controller_P, controller_D):
+	def __init__(self, obs_dim, act_dim, observable_class_name, state_pos_idx, state_vel_idx, controller_P, controller_D):
 		"""
 			Initialize policy and set up params  
 			Parameters
 				obs_dim - input dimensions as int (M)
 				act_dim - output dimensions as int (A)
-				observable_class - the observable class object containing the lifting function 
+				observable_class_name - name of the observable class corresponding to a desired lifting function 
 				controller_P - a PD controller's P gain
 				controller_D - a PD controller's D gain
 		"""
@@ -21,7 +29,7 @@ class TruncatedKoopmanNetworkPolicy(torch.nn.Module):
 		self.obs_dim, self.act_dim = obs_dim, act_dim
 
 		#instantiate observable (has lifting function)
-		self.observable = observable_class(obs_dim)
+		self.observable = torch_observables.get_observable(observable_class_name)(obs_dim)
 		
 		#size of the lifted state (D)
 		self.lifted_dim = self.observable.compute_observables_from_self()
@@ -73,13 +81,13 @@ class TruncatedKoopmanNetworkPolicy(torch.nn.Module):
 	
 
 class MinKoopmanNetworkPolicy(torch.nn.Module):
-	def __init__(self, obs_dim, act_dim, observable_class, state_pos_idx, state_vel_idx, controller_P, controller_D):
+	def __init__(self, obs_dim, act_dim, observable_class_name, state_pos_idx, state_vel_idx, controller_P, controller_D):
 		"""
 			Initialize policy and set up params  
 			Parameters
 				obs_dim - input dimensions as int (M)
 				act_dim - output dimensions as int (A)
-				observable_class - the observable class object containing the lifting function 
+				observable_class_name - name of the observable class corresponding to a desired lifting function 
 				controller_P - a PD controller's P gain
 				controller_D - a PD controller's D gain
 		"""
@@ -88,7 +96,7 @@ class MinKoopmanNetworkPolicy(torch.nn.Module):
 		self.obs_dim, self.act_dim = obs_dim, act_dim
 
 		#instantiate observable (has lifting function)
-		self.observable = observable_class(obs_dim)
+		self.observable = torch_observables.get_observable(observable_class_name)(obs_dim)
 		
 		#size of the lifted state (D)
 		self.lifted_dim = self.observable.compute_observables_from_self()

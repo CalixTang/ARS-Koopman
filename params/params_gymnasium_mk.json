@@ -1,9 +1,9 @@
-{"delta_std"	:	0.05,
+{"delta_std"	:	0.02,
 "deltas_used"	:	160,
 "dir_path"	:	"data",
 "filter"	:	"NoFilter",
 "filter_checkpoint_path"	:	null,
-"lifting_function": "Locomotion",
+"lifting_function": "LargeManipulation",
 "n_directions"	:	320,
 "n_iter"	:	5000,
 "n_workers"	:	8,
@@ -17,5 +17,5 @@
 "run_name"	:	"fetchpush-arsmk-1",
 "seed"	:	237,
 "shift"	:	0,
-"step_size"	:	0.05,
+"step_size"	:	0.02,
 "task_id"	:	"FetchPush-v2"}

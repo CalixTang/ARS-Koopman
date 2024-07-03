@@ -26,8 +26,8 @@ import os
 from ARS import logz
 from ARS.graph_results import graph_training_and_eval_rewards
 
-from ppo_policies import TruncatedKoopmanNetworkPolicy, MinKoopmanNetworkPolicy, NNPolicy
-from torch_observables import LocomotionObservableTorch
+from ppo_policies import TruncatedKoopmanNetworkPolicy, MinKoopmanNetworkPolicy, NNPolicy, get_policy
+from torch_observables import LocomotionObservableTorch, LargeManipulationObservableTorch
 
 class PPO:
     """
@@ -79,7 +79,12 @@ class PPO:
         self.critic_optim = Adam(self.critic.parameters(), lr=self.lr)
 
         # Initialize the covariance matrix used to query the actor for actions
-        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.2, dtype = torch.float32) #originally 0.5 
+        
+        if self.act_dim == len(self.actor_noise):
+            self.cov_var = torch.tensor(self.actor_noise) 
+        else:
+            #hack - take the first val in the array for now... 
+            self.cov_var = torch.full(size=(self.act_dim,), fill_value = self.actor_noise[0], dtype = torch.float32) #originally 0.5 
         self.cov_mat = torch.diag(self.cov_var)
 
         # This logger will help us with printing out summaries of each iteration
@@ -519,7 +524,8 @@ class PPO:
         self.ent_coef = hyperparameters.get('ent_coef', 0)                               # Entropy coefficient for Entropy Regularization
         self.target_kl = hyperparameters.get('target_kl', 0.02)                           # KL Divergence threshold
         self.max_grad_norm = hyperparameters.get('max_grad_norm', 0.5)                        # Gradient Clipping threshold
-
+        self.actor_noise = hyperparameters.get('actor_noise', [0.2])                      #default noise to add to actor movement in training
+        print(self.actor_noise)
 
         # Miscellaneous parameters
         self.render = hyperparameters.get('render', False)                             # If we should render during rollout
@@ -677,9 +683,9 @@ def get_state_pos_and_vel_idx(task_name):
     else:
         state_pos_idx = np.r_[:]
         state_vel_idx = np.r_[:]
-    
-
     return state_pos_idx, state_vel_idx
+
+
 def handle_extra_params(params, extra_env_params):
     """
     A helper function used to extract relevant env hyperparams from all params parsed with ArgParse. 
@@ -687,6 +693,7 @@ def handle_extra_params(params, extra_env_params):
     """
 
     task_name = params['task_id'].split('-')[0]
+    print(task_name)
     if task_name == 'FrankaKitchen':
         pass
     elif 'Fetch' in task_name:
@@ -695,8 +702,6 @@ def handle_extra_params(params, extra_env_params):
     elif 'HandManipulate' in task_name:
         extra_env_params['max_timesteps_per_episode'] = params.get('max_timesteps_per_episode', 50)
         extra_env_params['reward_type'] = params.get('reward_type', 'dense') #dense or sparse
-
-    return
 
 
 def run_ppo(params):
@@ -738,7 +743,8 @@ def run_ppo(params):
         'log_dir': logdir,
         'task_id': params['task_id'],
         'num_envs': params['num_envs'],
-        'num_eval_rollouts': params['num_eval_rollouts']
+        'num_eval_rollouts': params['num_eval_rollouts'],
+        'actor_noise': params['actor_noise']
     }
     
     #set up dummy environment to extract shape info
@@ -752,7 +758,9 @@ def run_ppo(params):
         obs_dim = env.observation_space.shape[0]
     act_dim = env.action_space.shape[0]
     state_pos_idx, state_vel_idx = get_state_pos_and_vel_idx(params['task_id'])
-    actor = MinKoopmanNetworkPolicy(obs_dim, act_dim, LocomotionObservableTorch, state_pos_idx, state_vel_idx, params['PDctrl_P'], params['PDctrl_D'])
+
+    #set up actor policy
+    actor = get_policy(params['policy_type'], obs_dim, act_dim, params['lifting_function'], state_pos_idx, state_vel_idx, params['PDctrl_P'], params['PDctrl_D'])
     
 	#set up critic network (obs -> val)
     critic = NNPolicy(obs_dim, 1)
@@ -769,12 +777,6 @@ def run_ppo(params):
 	#TODO: save koopman policy weights, actor and critic networks as pytorch models, and any relevant figures
 
     return
-
-def get_policy(policy_type, obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D):
-    if policy_type == 'truncatedkoopman':
-        return TruncatedKoopmanNetworkPolicy(obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D)
-    elif policy_type == 'minkoopman':
-        return MinKoopmanNetworkPolicy(obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D)
 
 if __name__ == '__main__':
     import argparse
@@ -800,7 +802,9 @@ if __name__ == '__main__':
     parser.add_argument('--ent_coef', type = float, default = 0) # Entropy coefficient for Entropy Regularization 
     parser.add_argument('--target_kl', type = float, default = 0.02) # KL Divergence threshold 
     parser.add_argument('--max_grad_norm', type = float, default = 0.5) # Gradient Clipping threshold 
-	# for Swimmer-v1 and HalfCheetah-v1 use shift = 0
+    parser.add_argument('--actor_noise', type = float, default = [0.2], nargs='*') #the noise to allow for the actor actions
+    parser.add_argument('--lifting_function', default = "Locomotion") #the noise to allow for the actor actions
+    # for Swimmer-v1 and HalfCheetah-v1 use shift = 0
     # for Hopper-v1, Walker2d-v1, and Ant-v1 use shift = 1
     # for Humanoid-v1 used shift = 5
     parser.add_argument('--shift', type=float, default = 0) #TODO: tweak as necessary
