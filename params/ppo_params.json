@@ -15,7 +15,7 @@
 "ppo_gamma"	:	0.98,
 "ppo_lr"	:	0.002,
 "reward_type"   :    "dense",
-"run_name"	:	"fetchpush-ppotk-1",
+"run_name"	:	"fetchpush-ppomk-1",
 "seed"	:	237,
 "shift"	:	0,
 "target_kl"	:	0.03,

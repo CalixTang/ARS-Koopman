@@ -155,6 +155,7 @@ class PDControlLayer(torch.nn.Module):
 		assert act_dim == state_vel_idx.shape[0]
 
 		self.obs_dim = obs_dim
+		self.act_dim = act_dim
 		self.state_pos_idx, self.state_vel_idx = state_pos_idx, state_vel_idx
 		self.P, self.D = P, D
 
@@ -198,8 +199,10 @@ class PDControlLayer(torch.nn.Module):
 		vel = self.vel_extract_layer(obs)
 
 		if (next_state.shape[-1] == self.act_dim):
+			#handle min koopman policy
 			setpoint = next_state
 		else:
+			#everything else
 			setpoint = self.pos_extract_layer(next_state)
 		
 		#proportional gain = kP * (setpoint - curr pos)
