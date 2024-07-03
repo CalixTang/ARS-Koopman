@@ -93,10 +93,12 @@ class MinKoopmanNetworkPolicy(torch.nn.Module):
 		#(truncated) koopman matrix. of size [A, D]. We do not want a bias term.
 		self.koopman_layer = torch.nn.Linear(self.lifted_dim, self.act_dim, bias = False, dtype = torch.float32)
 
-		#TODO - figure out if this initialization is necessary or useful
-		#initialize koopman layer's weights to identity instead of the default Linear random init b/c of koopman update
+		#initialize koopman layer's weights to stay at the same current position
 		with torch.no_grad():
-			self.koopman_layer.weight.copy_(torch.nn.Parameter(torch.eye(self.act_dim, self.lifted_dim)))
+			self.koopman_layer.weight.copy_(torch.nn.Parameter(torch.zeros(self.act_dim, self.lifted_dim)))
+
+			for i in range(self.state_pos_idx.shape[0]):
+				self.koopman_layer.weight[i, self.state_pos_idx[i]] = 1
 		
 		#PD control layer
 		self.PD_layer = PDControlLayer(self.obs_dim, self.act_dim, state_pos_idx, state_vel_idx, controller_P, controller_D)

@@ -7,13 +7,14 @@
 "max_grad_norm"	:	0.2,
 "max_timesteps_per_episode"	:	50,
 "n_updates_per_iteration"	:	20,
-"num_envs"	:	100,
+"num_envs"	:	128,
 "num_eval_rollouts"	:	100,
 "num_minibatches"	:	5,
 "params_path"	:	null,
 "policy_checkpoint_path"	:	null,
+"policy_type": "minkoopman",
 "ppo_gamma"	:	0.98,
-"ppo_lr"	:	0.002,
+"ppo_lr"	:	0.0001,
 "reward_type"   :    "dense",
 "run_name"	:	"fetchpush-ppomk-1",
 "seed"	:	237,
@@ -21,4 +22,4 @@
 "target_kl"	:	0.03,
 "task_id"	:	"FetchPush-v2",
 "timesteps_per_batch"	:	1000,
-"total_timesteps"	:	1e8}
+"total_timesteps"	:	1e7}

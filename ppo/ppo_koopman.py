@@ -770,6 +770,12 @@ def run_ppo(params):
 
     return
 
+def get_policy(policy_type, obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D):
+    if policy_type == 'truncatedkoopman':
+        return TruncatedKoopmanNetworkPolicy(obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D)
+    elif policy_type == 'minkoopman':
+        return MinKoopmanNetworkPolicy(obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D)
+
 if __name__ == '__main__':
     import argparse
 
@@ -806,6 +812,7 @@ if __name__ == '__main__':
     parser.add_argument('--PDctrl_D', type = float, default = 0.001)
     
     #utility arguments
+    parser.add_argument('--policy_type', type = str, default = 'minkoopman')
     parser.add_argument('--dir_path', type=str, default='data') #the folder to save runs to
     parser.add_argument('--params_path', type = str, default = None)
     parser.add_argument('--policy_checkpoint_path', type = str)
