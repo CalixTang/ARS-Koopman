@@ -33,6 +33,29 @@ def instantiate_gym_env(task_id, policy_params):
 
     return env
 
+def instantiate_gym_envs(policy_params):
+    """
+    Helper function to instantiate gym environments. Mainly handles different env hyperparameters from different env suites.
+    """
+    task_name = policy_params['task_id'].split('-')[0]
+
+    if task_name == 'FrankaKitchen':
+        pass
+    elif 'Fetch' in task_name:
+        env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_envs'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'])
+        eval_env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_eval_rollouts'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'] )
+    elif 'HandManipulate' in task_name:
+        env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_envs'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'])
+        eval_env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_eval_rollouts'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'] )
+    else:
+        env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_envs'])
+        eval_env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_eval_rollouts'])
+        
+    env.reset(seed = policy_params['seed'])
+    eval_env.reset(seed = policy_params['seed'])
+
+    return env, eval_env
+
 def handle_extra_params(params, extra_env_params):
     """
     A helper function used to extract relevant env hyperparams from all params parsed with ArgParse. 

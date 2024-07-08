@@ -28,13 +28,13 @@ from ARS.graph_results import graph_training_and_eval_rewards
 
 from ppo_policies import TruncatedKoopmanNetworkPolicy, MinKoopmanNetworkPolicy, NNPolicy, get_policy
 from torch_observables import LocomotionObservableTorch, LargeManipulationObservableTorch
-from koopmanutils.env_utils import handle_extra_params, get_state_pos_and_vel_idx
+from koopmanutils.env_utils import handle_extra_params, get_state_pos_and_vel_idx, instantiate_gym_envs
 
 class PPO:
     """
         This is the PPO class we will use as our model in main.py
     """
-    def __init__(self, actor, critic, task_id, hyperparameters, extra_env_params = dict()):
+    def __init__(self, actor, critic, task_id, hyperparameters):
         """
             Initializes the PPO model, including hyperparameters.
 
@@ -69,7 +69,7 @@ class PPO:
         self.act_dim = dummy_env.action_space.shape[0]
 
         # Initialize actual envs
-        self.env, self.eval_env = self.instantiate_gym_envs(extra_env_params)
+        self.env, self.eval_env = instantiate_gym_envs(hyperparameters)
 
         # Initialize actor and critic networks
         self.actor = actor                                                 # ALG STEP 1
@@ -551,28 +551,6 @@ class PPO:
             torch.manual_seed(self.seed)
             print(f"Successfully set seed to {self.seed}")
 
-    def instantiate_gym_envs(self, extra_params):
-        """
-        Helper function to instantiate gym environments. Mainly handles different env hyperparameters from different env suites.
-        """
-        task_name = self.task_id.split('-')[0]
-
-        if task_name == 'FrankaKitchen':
-            pass
-        elif 'Fetch' in task_name:
-            env = gym.vector.make(self.task_id, num_envs = self.num_envs, max_episode_steps = extra_params['rollout_length'],  reward_type = extra_params['reward_type'])
-            eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts, max_episode_steps = extra_params['rollout_length'],  reward_type = extra_params['reward_type'] )
-        elif 'HandManipulate' in task_name:
-            env = gym.vector.make(self.task_id, num_envs = self.num_envs, max_episode_steps = extra_params['rollout_length'],  reward_type = extra_params['reward_type'])
-            eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts, max_episode_steps = extra_params['rollout_length'],  reward_type = extra_params['reward_type'] )
-        else:
-            env = gym.vector.make(self.task_id, num_envs = self.num_envs)
-            eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts)
-            
-        env.reset(seed = self.seed)
-        eval_env.reset(seed = self.seed)
-
-        return env, eval_env
 
     def _log_summary(self):
         """
@@ -697,11 +675,11 @@ def run_ppo(params):
 	#set up critic network (obs -> val)
     critic = NNPolicy(obs_dim, 1)
 
-    extra_env_params = {}
-    handle_extra_params(params, extra_env_params)
+    # extra_env_params = {}
+    handle_extra_params(params, ppo_hyperparameters)
 
 	#instantitate ppo object with params
-    ppo = PPO(actor, critic, params['task_id'], ppo_hyperparameters, extra_env_params = extra_env_params)
+    ppo = PPO(actor, critic, params['task_id'], ppo_hyperparameters)
     
 	#run ppo learn
     ppo.learn(params['total_timesteps'])
