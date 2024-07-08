@@ -7,7 +7,7 @@
 "lam"	:	0.98,
 "lifting_function"     : "LargeManipulation",
 "max_grad_norm"	:	0.1,
-"max_timesteps_per_episode"	:	100,
+"rollout_length"	:	100,
 "n_updates_per_iteration"	:	5,
 "num_envs"	:	32,
 "num_eval_rollouts"	:	100,

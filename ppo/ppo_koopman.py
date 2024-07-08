@@ -28,6 +28,7 @@ from ARS.graph_results import graph_training_and_eval_rewards
 
 from ppo_policies import TruncatedKoopmanNetworkPolicy, MinKoopmanNetworkPolicy, NNPolicy, get_policy
 from torch_observables import LocomotionObservableTorch, LargeManipulationObservableTorch
+from koopmanutils.env_utils import handle_extra_params, get_state_pos_and_vel_idx
 
 class PPO:
     """
@@ -111,7 +112,7 @@ class PPO:
             Return:
                 None
         """
-        print(f"Learning... Running {self.max_timesteps_per_episode} timesteps per episode, ", end='')
+        print(f"Learning... Running {self.rollout_length} timesteps per episode, ", end='')
         print(f"{self.timesteps_per_batch} timesteps per batch for a total of {total_timesteps} timesteps")
         self.logger['start_time'] = time.time()
         t_so_far = 0 # Timesteps simulated so far
@@ -377,8 +378,8 @@ class PPO:
             # Initially, envs are not done
             dones = torch.zeros((self.num_envs if not eval else self.num_eval_rollouts, )).float()
 
-            # Run an episode for a maximum of max_timesteps_per_episode timesteps
-            for ep_t in range(self.max_timesteps_per_episode):
+            # Run an episode for a maximum of rollout_length timesteps
+            for ep_t in range(self.rollout_length):
                 # If render is specified, render the environment
                 if self.render:
                     env.render()
@@ -516,7 +517,7 @@ class PPO:
         # Initialize default values for hyperparameters
         # Algorithm hyperparameters
         self.timesteps_per_batch = hyperparameters.get('timesteps_per_batch', 4800)                 # Number of timesteps to run per batch
-        self.max_timesteps_per_episode = hyperparameters.get('max_timesteps_per_episode', 1600)           # Max number of timesteps per episode
+        self.rollout_length = hyperparameters.get('rollout_length', 1600)           # Max number of timesteps per episode
         self.n_updates_per_iteration = hyperparameters.get('n_updates_per_iteration', 5)                # Number of times to update actor/critic per iteration
         self.lr = hyperparameters.get('lr', 0.005)                                 # Learning rate of actor optimizer
         self.gamma = hyperparameters.get('gamma', 0.95)                               # Discount factor to be applied when calculating Rewards-To-Go
@@ -559,11 +560,11 @@ class PPO:
         if task_name == 'FrankaKitchen':
             pass
         elif 'Fetch' in task_name:
-            env = gym.vector.make(self.task_id, num_envs = self.num_envs, max_episode_steps = extra_params['max_timesteps_per_episode'],  reward_type = extra_params['reward_type'])
-            eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts, max_episode_steps = extra_params['max_timesteps_per_episode'],  reward_type = extra_params['reward_type'] )
+            env = gym.vector.make(self.task_id, num_envs = self.num_envs, max_episode_steps = extra_params['rollout_length'],  reward_type = extra_params['reward_type'])
+            eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts, max_episode_steps = extra_params['rollout_length'],  reward_type = extra_params['reward_type'] )
         elif 'HandManipulate' in task_name:
-            env = gym.vector.make(self.task_id, num_envs = self.num_envs, max_episode_steps = extra_params['max_timesteps_per_episode'],  reward_type = extra_params['reward_type'])
-            eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts, max_episode_steps = extra_params['max_timesteps_per_episode'],  reward_type = extra_params['reward_type'] )
+            env = gym.vector.make(self.task_id, num_envs = self.num_envs, max_episode_steps = extra_params['rollout_length'],  reward_type = extra_params['reward_type'])
+            eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts, max_episode_steps = extra_params['rollout_length'],  reward_type = extra_params['reward_type'] )
         else:
             env = gym.vector.make(self.task_id, num_envs = self.num_envs)
             eval_env = gym.vector.make(self.task_id, num_envs = self.num_eval_rollouts)
@@ -634,79 +635,6 @@ class PPO:
         self.logger['actor_losses'] = []
 
 
-def get_state_pos_and_vel_idx(task_name):
-    '''
-		Helper function that returns all the state position and velocity indices. Used to instantiate the koopman policy actor network.
-        
-        Parameters
-			task_name - the name of the relevant task.
-
-        Returns
-			state_pos_idx - an (ordered) list of position indices in order of corresponding variable in the action dimension
-            state_vel_idx - an (ordered) list of velocity indices in order of corresponding variable in the action dimension
-            
-    '''
-    task_name = task_name.split('-')[0] #remove the v[x] 
-    state_pos_idx, state_vel_idx = None, None
-    
-	#Relevant docs for mujoco tasks - https://www.gymlibrary.dev/environments/mujoco/
-    if task_name == 'Swimmer':
-        state_pos_idx = np.r_[1:3]
-        state_vel_idx = np.r_[6:8]
-    elif task_name == 'Hopper':
-        state_pos_idx = np.r_[2:5]
-        state_vel_idx = np.r_[8:11]
-    elif task_name == 'HalfCheetah':
-        state_pos_idx = np.r_[2:8]
-        state_vel_idx = np.r_[11:17]
-    elif task_name == 'Walker2d':
-        state_pos_idx = np.r_[2:8]
-        state_vel_idx = np.r_[11:17]
-    elif task_name == 'Ant':
-        state_pos_idx = np.r_[5:13]
-        state_vel_idx = np.r_[19:27]
-    elif task_name == 'Humanoid':
-        state_pos_idx = np.r_[6, 5, 7 : 22]
-        state_vel_idx = np.r_[29, 28, 30 : 45]
-    elif task_name == 'FrankaKitchen':
-        # https://robotics.farama.org/envs/franka_kitchen/franka_kitchen/
-        state_pos_idx = np.r_[0 : 9]
-        state_vel_idx = np.r_[9 : 18]
-    elif 'HandManipulate' in task_name:
-        # https://robotics.farama.org/envs/shadow_dexterous_hand/manipulate_egg/ - this applies to the rest of the handmanipulate tasks
-        state_pos_idx = np.r_[0 : 5, 6 : 9, 10 : 13, 14 : 18, 19 : 24]
-        state_vel_idx = np.r_[24 : 29, 30 : 33, 34 : 37, 38 : 42, 43 : 48]
-    elif task_name == 'FetchReach':
-        # https://robotics.farama.org/envs/fetch/reach/
-        state_pos_idx = np.r_[0 : 4]
-        state_vel_idx = np.r_[5 : 9]        
-    elif 'Fetch' in task_name:
-        # https://robotics.farama.org/envs/fetch/
-        state_pos_idx = np.r_[0 : 3, 9]
-        state_vel_idx = np.r_[20 : 24]
-    else:
-        state_pos_idx = np.r_[:]
-        state_vel_idx = np.r_[:]
-    return state_pos_idx, state_vel_idx
-
-
-def handle_extra_params(params, extra_env_params):
-    """
-    A helper function used to extract relevant env hyperparams from all params parsed with ArgParse. 
-    Modifies extra_env_params in-place.
-    """
-
-    task_name = params['task_id'].split('-')[0]
-    print(task_name)
-    if task_name == 'FrankaKitchen':
-        pass
-    elif 'Fetch' in task_name:
-        extra_env_params['max_timesteps_per_episode'] = params.get('max_timesteps_per_episode', 50)
-        extra_env_params['reward_type'] = params.get('reward_type', 'dense') #dense or sparse
-    elif 'HandManipulate' in task_name:
-        extra_env_params['max_timesteps_per_episode'] = params.get('max_timesteps_per_episode', 50)
-        extra_env_params['reward_type'] = params.get('reward_type', 'dense') #dense or sparse
-
 
 def run_ppo(params):
     print("Parameters: ", params)
@@ -732,7 +660,7 @@ def run_ppo(params):
     #set up ppo hyperparameters
     ppo_hyperparameters = {
         'timesteps_per_batch': params['timesteps_per_batch'],
-        'max_timesteps_per_episode': params['max_timesteps_per_episode'],
+        'rollout_length': params['rollout_length'],
         'n_updates_per_iteration': params['n_updates_per_iteration'],
         'lr': params['ppo_lr'],
         'gamma': params['ppo_gamma'],
@@ -795,7 +723,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_envs', type = int, default = 5) #number of parallel environments
     #I'm going to use reward shift like ARS does because it seems useful for training
     parser.add_argument('--timesteps_per_batch', type = int, default = 5000) # Number of timesteps to run per batch
-    parser.add_argument('--max_timesteps_per_episode', type = int, default = 1000) # Max number of timesteps per episode (max rollout length) - important: different env suites will have different normal values
+    parser.add_argument('--rollout_length', type = int, default = 1000) # Max number of timesteps per episode (max rollout length) - important: different env suites will have different normal values
     parser.add_argument('--n_updates_per_iteration', type = int, default = 5) # Number of times to update actor/critic per iteration
     parser.add_argument('--ppo_lr', type = float, default = 5e-3) #LR for actor
     parser.add_argument('--ppo_gamma', type = float, default = 0.95) #reward discount factor
