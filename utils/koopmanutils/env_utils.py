@@ -39,14 +39,9 @@ def instantiate_gym_envs(policy_params):
     """
     task_name = policy_params['task_id'].split('-')[0]
 
-    if task_name == 'FrankaKitchen':
-        pass
-    elif 'Fetch' in task_name:
-        env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_envs'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'])
-        eval_env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_eval_rollouts'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'] )
-    elif 'HandManipulate' in task_name:
-        env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_envs'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'])
-        eval_env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_eval_rollouts'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'] )
+    if 'Fetch' in task_name or 'HandManipulate' in task_name or 'AdroitHand' in task_name:
+        env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_envs'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'], render_mode = policy_params.get('render_mode', None), width = policy_params.get('vid_res', [0])[0], height = policy_params.get('vid_res', [0, 0])[1])
+        eval_env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_eval_rollouts'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'], render_mode = policy_params.get('render_mode', None), width = policy_params.get('vid_res', [0])[0], height = policy_params.get('vid_res', [0, 0])[1] )
     else:
         env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_envs'])
         eval_env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_eval_rollouts'])
@@ -71,6 +66,9 @@ def handle_extra_params(params, extra_env_params):
         extra_env_params['reward_type'] = params.get('reward_type', 'dense') #dense or sparse
     elif 'HandManipulate' in task_name:
         extra_env_params['rollout_length'] = params.get('rollout_length', 50)
+        extra_env_params['reward_type'] = params.get('reward_type', 'dense') #dense or sparse
+    elif 'AdroitHand' in task_name:
+        extra_env_params['rollout_length'] = params.get('rollout_length', 200)
         extra_env_params['reward_type'] = params.get('reward_type', 'dense') #dense or sparse
 
 def get_state_pos_and_vel_idx(task_name):
@@ -123,6 +121,9 @@ def get_state_pos_and_vel_idx(task_name):
         # https://robotics.farama.org/envs/fetch/
         state_pos_idx = np.r_[0 : 3, 9]
         state_vel_idx = np.r_[20 : 24]
+    elif task_name == 'AdroitHandRelocate':
+        state_pos_idx = np.r_[0 : 30]
+        state_vel_idx = np.r_[:] #TODO: figure out a way to get the velocities...
     else:
         state_pos_idx = np.r_[:]
         state_vel_idx = np.r_[:]

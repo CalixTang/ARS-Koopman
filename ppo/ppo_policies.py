@@ -6,11 +6,14 @@ import torch.nn.functional as F
 import numpy as np
 import torch_observables
 
-def get_policy(policy_type, obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D):
+def get_policy(policy_type, obs_dim, act_dim, observable = None, state_pos_idx = [], state_vel_idx = [], P = 0.1, D = 0.001):
     if policy_type == 'truncatedkoopman':
         return TruncatedKoopmanNetworkPolicy(obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D)
     elif policy_type == 'minkoopman':
         return MinKoopmanNetworkPolicy(obs_dim, act_dim, observable, state_pos_idx, state_vel_idx, P, D)
+    elif policy_type == 'nn':
+        return NNPolicy(obs_dim, act_dim)
+
     raise NotImplementedError
 	
 class TruncatedKoopmanNetworkPolicy(torch.nn.Module):
@@ -276,6 +279,12 @@ class NNPolicy(torch.nn.Module):
 		output = self.layer3(activation2)
 
 		return output
+	
+	def get_koopman_matrix(self):
+		"""
+			A getter func for the internal koopman matrix. Included for compatibility with the ppo trainer
+		"""
+		return []
 	
 #For Unit testing - remove when done
 # if __name__ == '__main__':
