@@ -97,6 +97,7 @@ class PPO:
             'batch_lens': [],       # episodic lengths in batch
             'batch_rews': [],       # episodic returns in batch
             'actor_losses': [],     # losses of actor network in current iteration
+            'critic_losses': [],
             'lr': 0,
         }
 
@@ -149,6 +150,7 @@ class PPO:
             inds = np.arange(step)
             minibatch_size = step // self.num_minibatches
             loss = []
+            critic_losses = []
 
             for _ in range(self.n_updates_per_iteration):                                                       # ALG STEP 6 & 7
                 # Learning Rate Annealing
@@ -210,6 +212,7 @@ class PPO:
                     # Gradient Clipping with given threshold
                     nn.utils.clip_grad_norm_(self.actor.parameters(), self.max_grad_norm)
                     self.actor_optim.step()
+                    print(torch.norm(self.actor.koopman_layer.weight.grad))
 
                     # Calculate gradients and perform backward propagation for critic network
                     self.critic_optim.zero_grad()
@@ -218,12 +221,15 @@ class PPO:
                     self.critic_optim.step()
 
                     loss.append(actor_loss.detach())
+                    critic_losses.append(critic_loss.detach())
                 # Approximating KL Divergence
                 if approx_kl > self.target_kl:
                     break # if kl aboves threshold
             # Log actor loss
             avg_loss = sum(loss) / len(loss)
+            avg_critic_loss = sum(critic_losses) / len(critic_losses)
             self.logger['actor_losses'].append(avg_loss)
+            self.logger['critic_losses'].append(avg_critic_loss)
 
             # Log a summary of our training so far
             self._log_summary()
@@ -244,10 +250,6 @@ class PPO:
                 #use helper func to translate batch rews to ep rews
                 ep_rews = self.conv_batch_rews_to_ep_rews(batch_rews).detach()
                 mean_rew, std_rew, min_rew, max_rew = ep_rews.mean(), ep_rews.std(), ep_rews.min(), ep_rews.max()
-                
-                if i_so_far == 10:
-                    print("Episodic rewards: ", ep_rews)
-                    print("Batch rewards: ", batch_rews)
 
                 #save ep rewards
                 eval_ep_rew.append(ep_rews)
@@ -602,6 +604,7 @@ class PPO:
         ep_rews = self.conv_batch_rews_to_ep_rews(self.logger['batch_rews']).detach()
         avg_ep_rews, std_ep_rews, max_ep_rews, min_ep_rews = ep_rews.mean(), ep_rews.std(), ep_rews.max(), ep_rews.min()
         avg_actor_loss = np.mean([losses.float().mean() for losses in self.logger['actor_losses']])
+        avg_critic_loss = np.mean([losses.float().mean() for losses in self.logger['critic_losses']])
 
         # Round decimal places for more aesthetic logging messages
         # avg_ep_lens = str(round(avg_ep_lens, 5))
@@ -619,6 +622,7 @@ class PPO:
         print("Max Episodic Reward ", max_ep_rews)
         print("Min Episodic Reward ", min_ep_rews)
         print("Average Actor Loss ", avg_actor_loss)
+        print("Average Critic Loss ", avg_critic_loss)
         print("Current Elapsed Timesteps ", t_so_far)
         print("Iteration Time (secs) ", delta_t)
         print("Learning Rate ", lr)
