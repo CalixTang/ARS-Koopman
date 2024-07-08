@@ -212,7 +212,7 @@ class PPO:
                     # Gradient Clipping with given threshold
                     nn.utils.clip_grad_norm_(self.actor.parameters(), self.max_grad_norm)
                     self.actor_optim.step()
-                    print(torch.norm(self.actor.koopman_layer.weight.grad))
+                    # print(torch.norm(self.actor.koopman_layer.weight.grad))
 
                     # Calculate gradients and perform backward propagation for critic network
                     self.critic_optim.zero_grad()
