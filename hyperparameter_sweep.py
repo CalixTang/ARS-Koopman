@@ -1,5 +1,6 @@
 import argparse
 import itertools
+import os
 """
 A very simple grid sweep function. I wrote it this way to make it generalizable to all scripts and param setups in this repo.
 """
@@ -13,7 +14,7 @@ def dict_product(dicts):
      {'character': 'b', 'number': 1},
      {'character': 'b', 'number': 2}]
     """
-    return (dict(zip(dicts.keys(), x)) for x in itertools.product(*dicts.values()))
+    return (dict(zip(dicts, x)) for x in itertools.product(*dicts.values()))
 
 def delimit_task_id(task_id):
     return task_id.split('-')[0]
@@ -29,15 +30,16 @@ if __name__ == '__main__':
 
     if args.params_path is not None:
         import json
-        params = json.load(open(args.params_path, 'r'))
-        params = vars(params)
+        params = dict(json.load(open(args.params_path, 'r')))
+        print(params)
     
     ctr = 0
 
     hyp_sweep_params = list(dict_product(params))
+    print(hyp_sweep_params)
 
 
-    exec_string_base = args.script_name
+    exec_string_base = "python " + args.script_name
     
     # simple grid search for now
     for param_dict in hyp_sweep_params:
@@ -46,10 +48,16 @@ if __name__ == '__main__':
 
         #add options
         for k, v in param_dict.items():
-            exec_string += f' --{k} {v}'
+            if isinstance(v, list):
+                exec_string += f' --{k}'
+                for elem in v:
+                    exec_string += f' {elem}'
+            else:
+                exec_string += f' --{k} {v}'
         
         #give each run a unique name and write output to a unique report file
-        exec_string += f'--run_name {task_name}-hsweeprun-{ctr} > reports/{task_name}-hsweeprun-{ctr}.out'
-        exec(exec_string)
+        exec_string += f' --run_name {task_name}-hsweeprun-{ctr} > reports/{task_name}-hsweeprun-{ctr}.out'
+        print(exec_string)
+        os.system(exec_string) #probably not the safest, but i hope nobody screws this up
 
         ctr += 1
