@@ -281,6 +281,10 @@ class PPO:
         #save best koopman mat
         np.save(os.path.join(self.log_dir, "best_koopman_policy_weights.npy"), best_koopman_mat)
 
+        #close envs
+        self.env.close()
+        self.eval_env.close()
+
 
     def conv_batch_rews_to_ep_rews(self, batch_rews):
         '''
