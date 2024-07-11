@@ -14,7 +14,7 @@ def instantiate_vec_gym_env(task_id, policy_params, num_envs):
         env = gym.vector.make(task_id, num_envs = num_envs, render_mode = policy_params.get('render_mode', None), width = policy_params.get('vid_res', [0])[0], height = policy_params.get('vid_res', [0, 0])[1])
         
     env.reset(seed = policy_params['seed'])
-
+    print(env.render_mode)
     return env
 
 def instantiate_gym_env(task_id, policy_params):
