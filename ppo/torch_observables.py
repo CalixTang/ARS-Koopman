@@ -46,7 +46,22 @@ class LargeManipulationObservableTorch():
         """
 
         obs = obs.detach().clone()
-        return torch.cat((obs, obs ** 2, torch.sin(obs), torch.cos(obs), torch.bmm(obs.unsqueeze(2), obs.unsqueeze(1))[:, torch.triu(torch.ones((obs.shape[1], obs.shape[1])), diagonal = 1).bool()], torch.flatten((obs ** 2).unsqueeze(1) * obs.unsqueeze(2), start_dim = 1)), axis = len(obs.shape) - 1)
+        if len(obs.shape) == 1:
+            return torch.cat((obs, 
+                              obs ** 2, 
+                              torch.sin(obs), 
+                              torch.cos(obs), 
+                              (obs.unsqueeze(1) @ obs.unsqueeze(0))[torch.triu(torch.ones((obs.shape[0], obs.shape[0])), diagonal = 1).bool()], 
+                              torch.flatten((obs ** 2).unsqueeze(0) * obs.unsqueeze(1))), 
+                              axis = len(obs.shape) - 1)
+        else:
+            return torch.cat((obs, 
+                              obs ** 2, 
+                              torch.sin(obs), 
+                              torch.cos(obs), 
+                              torch.bmm(obs.unsqueeze(2), obs.unsqueeze(1))[:, torch.triu(torch.ones((obs.shape[1], obs.shape[1])), diagonal = 1).bool()], 
+                              torch.flatten((obs ** 2).unsqueeze(1) * obs.unsqueeze(2), start_dim = 1)), 
+                              axis = len(obs.shape) - 1)
     
     def compute_observables_from_self(self):
         return 4 * self.obs_dim + (self.obs_dim * (self.obs_dim - 1)) // 2 + self.obs_dim ** 2
