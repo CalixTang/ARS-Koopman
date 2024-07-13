@@ -19,12 +19,7 @@ def instantiate_vec_gym_env(task_id, policy_params, num_envs):
 
 def instantiate_gym_env(task_id, policy_params):
     task_name = task_id.split('-')[0]
-
-    if task_name == 'FrankaKitchen':
-        pass
-    elif 'Fetch' in task_name:
-        env = gym.make(task_id, max_episode_steps = policy_params['rollout_length'], reward_type = policy_params['reward_type'], render_mode = policy_params.get('render_mode', None), width = policy_params.get('vid_res', [0])[0], height = policy_params.get('vid_res', [0, 0])[1])
-    elif 'HandManipulate' in task_name:
+    if 'Fetch' in task_name or 'HandManipulate' in task_name or 'HandReach' in task_name or 'AdroitHand' in task_name:
         env = gym.make(task_id, max_episode_steps = policy_params['rollout_length'], reward_type = policy_params['reward_type'], render_mode = policy_params.get('render_mode', None), width = policy_params.get('vid_res', [0])[0], height = policy_params.get('vid_res', [0, 0])[1])
     else:
         env = gym.make(task_id, render_mode = policy_params.get('render_mode', None), width = policy_params.get('vid_res', [0])[0], height = policy_params.get('vid_res', [0, 0])[1])
@@ -39,7 +34,7 @@ def instantiate_gym_envs(policy_params):
     """
     task_name = policy_params['task_id'].split('-')[0]
 
-    if 'Fetch' in task_name or 'HandManipulate' in task_name or 'AdroitHand' in task_name:
+    if 'Fetch' in task_name or 'HandManipulate' in task_name or 'HandReach' in task_name or 'AdroitHand' in task_name:
         env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_envs'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'], render_mode = policy_params.get('render_mode', None), width = policy_params.get('vid_res', [0])[0], height = policy_params.get('vid_res', [0, 0])[1])
         eval_env = gym.vector.make(policy_params['task_id'], num_envs = policy_params['num_eval_rollouts'], max_episode_steps = policy_params['rollout_length'],  reward_type = policy_params['reward_type'], render_mode = policy_params.get('render_mode', None), width = policy_params.get('vid_res', [0])[0], height = policy_params.get('vid_res', [0, 0])[1] )
     else:
@@ -64,8 +59,8 @@ def handle_extra_params(params, extra_env_params):
     elif 'Fetch' in task_name:
         extra_env_params['rollout_length'] = params.get('rollout_length', 50)
         extra_env_params['reward_type'] = params.get('reward_type', 'dense') #dense or sparse
-    elif 'HandManipulate' in task_name:
-        extra_env_params['rollout_length'] = params.get('rollout_length', 50)
+    elif 'HandManipulate' in task_name or 'HandReach' in task_name:
+        extra_env_params['rollout_length'] = params.get('rollout_length', 100)
         extra_env_params['reward_type'] = params.get('reward_type', 'dense') #dense or sparse
     elif 'AdroitHand' in task_name:
         extra_env_params['rollout_length'] = params.get('rollout_length', 200)
@@ -109,6 +104,10 @@ def get_state_pos_and_vel_idx(task_name):
         # https://robotics.farama.org/envs/franka_kitchen/franka_kitchen/
         state_pos_idx = np.r_[0 : 9]
         state_vel_idx = np.r_[9 : 18]
+    elif 'HandReach' in task_name:
+        # https://robotics.farama.org/envs/shadow_dexterous_hand/reach/
+        state_pos_idx = np.r_[0 : 5, 6 : 9, 10 : 13, 14 : 18, 19 : 24]
+        state_vel_idx = np.r_[24 : 29, 30 : 33, 34 : 37, 38 : 42, 43 : 48]
     elif 'HandManipulate' in task_name:
         # https://robotics.farama.org/envs/shadow_dexterous_hand/manipulate_egg/ - this applies to the rest of the handmanipulate tasks
         state_pos_idx = np.r_[0 : 5, 6 : 9, 10 : 13, 14 : 18, 19 : 24]
