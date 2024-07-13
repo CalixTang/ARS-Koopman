@@ -459,7 +459,7 @@ class PPO:
 
         # If we're testing, just return the deterministic action. Sampling should only be for training as our "exploration" factor.
         # Moved this before sampling to make code efficient
-        if eval or self.deterministic:
+        if eval or self.deterministic or np.random.random() > self.random_noise_chance:
             return mean.detach().numpy(), torch.tensor([1.])
 
         # Create a distribution with the mean action and std from the covariance matrix above.
@@ -532,7 +532,9 @@ class PPO:
         self.target_kl = hyperparameters.get('target_kl', 0.02)                           # KL Divergence threshold
         self.max_grad_norm = hyperparameters.get('max_grad_norm', 0.5)                        # Gradient Clipping threshold
         self.actor_noise = hyperparameters.get('actor_noise', [0.2])                      #default noise to add to actor movement in training
-        print(self.actor_noise)
+
+        self.random_noise_chance = max(0, min(hyperparameters.get('actor_noise_chance', 1.0), 1.))       #the chance of adding random noise during training
+        
 
         # Miscellaneous parameters
         self.render = hyperparameters.get('render', False)                             # If we should render during rollout
@@ -724,6 +726,7 @@ if __name__ == '__main__':
     parser.add_argument('--shift', type=float, default = 0) #TODO: tweak as necessary
     parser.add_argument('--seed', type = int) #random seed	
     parser.add_argument('--num_eval_rollouts', type = int, default = 100) #the number of environment rollouts to perform during evaluation. probably leave it at 100 for consistency
+    parser.add_argument('--actor_noise_chance', type = float, default = 1.0) #the chance of random noise being added during training. default to 0. legal values: [0, 1]
 
     #PD controller params - adding for flexibility but probably won't change at all
     parser.add_argument('--PDctrl_P', type = float, default = 0.1)

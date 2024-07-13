@@ -92,6 +92,7 @@ if __name__ == '__main__':
     parser.add_argument('--actor_weight_file', type=str, default = 'ppo_actor.pth') #this should be contained in logdir
     parser.add_argument('--num_rollouts', type = int, default = 20)
     parser.add_argument('--vid_res', default = [720, 640])
+    parser.add_argument('--seed', type = int, default = 237)
 
     args = parser.parse_args()
 
@@ -112,6 +113,8 @@ if __name__ == '__main__':
     actor_weight_path = os.path.join(args.logdir, args.actor_weight_file)
     actor.load_state_dict(torch.load(actor_weight_path))
     actor.eval()
+
+    params['seed'] = args.seed
 
     policy_params={'task_id' : params.get('task_id', 'FetchPush-v2'),
                    'rollout_length' : params.get('rollout_length', 50),
