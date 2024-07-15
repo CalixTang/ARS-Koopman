@@ -459,8 +459,8 @@ class PPO:
 
         # If we're testing, just return the deterministic action. Sampling should only be for training as our "exploration" factor.
         # Moved this before sampling to make code efficient
-        if eval or self.deterministic or np.random.random() > self.random_noise_chance:
-            return mean.detach().numpy(), torch.tensor([1.])
+        if eval or self.deterministic:
+            return mean.detach().numpy(), torch.ones((mean.shape[0]))
 
         # Create a distribution with the mean action and std from the covariance matrix above.
         # For more information on how this distribution works, check out Andrew Ng's lecture on it:
@@ -473,9 +473,15 @@ class PPO:
         # Calculate the log probability for that action
         log_prob = dist.log_prob(action)
 
+        # return action.detach().numpy(), log_prob.detach()
+        
+        #with 1 - self.actor_noise_chance probability, remove random noise...
+        noise_mask = (torch.rand((self.num_envs)) < self.actor_noise_chance)
+        mean_mask = ~noise_mask #mean mask happens to also be the log probs for deterministic actions
+        #does this work? idk
+        #TODO: consider allowing the deterministic random ones to not be of probability 1, but of the log prob as if they were sampled from the random distr. Is there a certain right or wrong?
+        return (mean * mean_mask.unsqueeze(1) + action * noise_mask.unsqueeze(1)).detach().numpy(), (log_prob * noise_mask + mean_mask).squeeze().detach()
 
-        # Return the sampled action and the log probability of that action in our distribution
-        return action.detach().numpy(), log_prob.detach()
 
     def evaluate(self, batch_obs, batch_acts):
         """
@@ -533,7 +539,7 @@ class PPO:
         self.max_grad_norm = hyperparameters.get('max_grad_norm', 0.5)                        # Gradient Clipping threshold
         self.actor_noise = hyperparameters.get('actor_noise', [0.2])                      #default noise to add to actor movement in training
 
-        self.random_noise_chance = max(0, min(hyperparameters.get('actor_noise_chance', 1.0), 1.))       #the chance of adding random noise during training
+        self.actor_noise_chance = max(0, min(hyperparameters.get('actor_noise_chance', 1.0), 1.))       #the chance of adding random noise during training
         
 
         # Miscellaneous parameters
