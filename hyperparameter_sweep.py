@@ -24,6 +24,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--script_name', type = str, required = True) #need to be as if you're running it, e.g. ARS/ARS/ars.py
     parser.add_argument('--params_path', type = str, required = True)
+    parser.add_argument('--run_base_name', type= str, default = None)
 
 
     args = parser.parse_args()
@@ -56,7 +57,10 @@ if __name__ == '__main__':
                 exec_string += f' --{k} {v}'
         
         #give each run a unique name and write output to a unique report file
-        exec_string += f' --run_name {task_name}-hsweeprun-{ctr} > reports/{task_name}-hsweeprun-{ctr}.out'
+        run_base_name = args.run_base_name
+        if not run_base_name:
+            run_base_name = task_name + '-hsweeprun'
+        exec_string += f' --run_name {run_base_name}-{ctr} > reports/{run_base_name}-{ctr}.out'
         print(exec_string)
         os.system(exec_string) #probably not the safest, but i hope nobody screws this up
 
