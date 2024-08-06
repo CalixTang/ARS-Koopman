@@ -1,0 +1,4 @@
+Training time is: 5121.498599 seconds.
+The final test error in lifted space is: 0.001827, and the error in original space is: 0.005483.
+The fake test error in lifted space is: 186.905967, and the fake error in original space is: 177.003150.
+The number of demo used for experiment is: 16000.

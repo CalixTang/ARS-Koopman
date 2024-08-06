@@ -47,7 +47,7 @@ from ARS.Observables import *
 # '''
 
 # MAIN =========================================================
-def main(demo_file, koopman_observable_choice = "LargeManipulationObservable", log_file = 'koopman_training_log.txt', out_file = 'koopman_matrix.npy'):
+def main(demo_file, koopman_observable_choice = "largemanipulation", log_file = 'koopman_training_log.txt', out_file = 'koopman_matrix.npy', train_ratio = 0.8):
     """
     Trains weights for a koopman matrix given demonstrations, the number of demos to use, and the lifting function to use.
 
@@ -56,6 +56,7 @@ def main(demo_file, koopman_observable_choice = "LargeManipulationObservable", l
             - koopman_observable_choice     The choice of koopman observable to use. Refer to observables.py in ARS for valid choices.
             - log_file                      Log file
             - out_file                      Output file (for the K matrix)
+            - train_ratio                   The ratio of training data to use. Must be in (0, 1].
     """
     # Velocity = True if velocity == 'True' else False
     # save_matrix = True if save_matrix == 'True' else False  # save the Koopman matrix for Drafted method and trained model for MLP/GNN
@@ -71,8 +72,18 @@ def main(demo_file, koopman_observable_choice = "LargeManipulationObservable", l
     # unit_train = False
     #load training data
 
-    #set up training data
-    training_episodes = np.load(demo_file) # len(training_episodes) = num_demo
+    #set up datasets
+    train_ratio = min(max(train_ratio, 0), 1)
+
+    all_episodes = np.load(demo_file) # len(training_episodes) = num_demo
+    
+    idx = np.arange(all_episodes.shape[0])
+    np.random.shuffle(idx)
+    
+    print(idx.shape)
+    split_idx = int(train_ratio * all_episodes.shape[0])
+    training_episodes, testing_episodes = all_episodes[idx[ : split_idx]], all_episodes[idx[split_idx : ]]
+
     num_episodes, timesteps_per_episode, obs_dim = training_episodes.shape
 
     # num_handpos = len(training_episodes[0][0]['handpos'])
@@ -151,20 +162,20 @@ def main(demo_file, koopman_observable_choice = "LargeManipulationObservable", l
     print("Koopman matrix is saved!\n")
     
     print("Koopman final testing starts!\n")
-    ErrorInLifted, ErrorInOriginal = koopman_evaluation(koopman_obj, cont_koopman_operator, training_episodes) #testing on training...
-    Fake_ErrorInLifted, Fake_ErrorInOriginal = koopman_evaluation(koopman_obj, Test_matrix, training_episodes)
+    ErrorInLifted, ErrorInOriginal = koopman_evaluation(koopman_obj, cont_koopman_operator, testing_episodes) #testing on training...
+    Fake_ErrorInLifted, Fake_ErrorInOriginal = koopman_evaluation(koopman_obj, Test_matrix, testing_episodes)
     print("Koopman final testing ends!\n")
 
     if error_calc == 'median': # compute the median 
-        print("The final test accuracy in lifted space is: %f, and the accuracy in original space is: %f."%(np.median(ErrorInLifted), np.median(ErrorInOriginal)))
-        print("The fake test accuracy in lifted space is: %f, and the fake accuracy in original space is: %f."%(np.median(Fake_ErrorInLifted), np.median(Fake_ErrorInOriginal)))
-        training_log_file.write("The final test accuracy in lifted space is: %f, and the accuracy in original space is: %f.\n"%(np.median(ErrorInLifted), np.median(ErrorInOriginal)))
-        training_log_file.write("The fake test accuracy in lifted space is: %f, and the fake accuracy in original space is: %f.\n"%(np.median(Fake_ErrorInLifted), np.median(Fake_ErrorInOriginal)))
+        print("The final test error in lifted space is: %f, and the error in original space is: %f."%(np.median(ErrorInLifted), np.median(ErrorInOriginal)))
+        print("The fake test error in lifted space is: %f, and the fake error in original space is: %f."%(np.median(Fake_ErrorInLifted), np.median(Fake_ErrorInOriginal)))
+        training_log_file.write("The final test error in lifted space is: %f, and the error in original space is: %f.\n"%(np.median(ErrorInLifted), np.median(ErrorInOriginal)))
+        training_log_file.write("The fake test error in lifted space is: %f, and the fake error in original space is: %f.\n"%(np.median(Fake_ErrorInLifted), np.median(Fake_ErrorInOriginal)))
     else:
-        print("The final test accuracy in lifted space is: %f, and the accuracy in original space is: %f."%(np.mean(ErrorInLifted), np.mean(ErrorInOriginal)))
-        print("The fake test accuracy in lifted space is: %f, and the fake accuracy in original space is: %f."%(np.mean(Fake_ErrorInLifted), np.mean(Fake_ErrorInOriginal)))
-        training_log_file.write("The final test accuracy in lifted space is: %f, and the accuracy in original space is: %f.\n"%(np.mean(ErrorInLifted), np.mean(ErrorInOriginal)))
-        training_log_file.write("The fake test accuracy in lifted space is: %f, and the fake accuracy in original space is: %f.\n"%(np.mean(Fake_ErrorInLifted), np.mean(Fake_ErrorInOriginal)))
+        print("The final test error in lifted space is: %f, and the error in original space is: %f."%(np.mean(ErrorInLifted), np.mean(ErrorInOriginal)))
+        print("The fake test error in lifted space is: %f, and the fake error in original space is: %f."%(np.mean(Fake_ErrorInLifted), np.mean(Fake_ErrorInOriginal)))
+        training_log_file.write("The final test error in lifted space is: %f, and the error in original space is: %f.\n"%(np.mean(ErrorInLifted), np.mean(ErrorInOriginal)))
+        training_log_file.write("The fake test error in lifted space is: %f, and the fake error in original space is: %f.\n"%(np.mean(Fake_ErrorInLifted), np.mean(Fake_ErrorInOriginal)))
     training_log_file.write("The number of demo used for experiment is: %d.\n"%(num_episodes))
     training_log_file.flush()
     training_log_file.close()
@@ -215,7 +226,7 @@ def koopman_evaluation(koopman_object, koopman_matrix, eval_episodes):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--demo_file', type=str, required = True, help='demo file to load')
-    parser.add_argument('--koopman_observable', type=str, default = 'LargeManipulationObservable')
+    parser.add_argument('--koopman_observable', type=str, default = 'largemanipulation')
     parser.add_argument('--log_file', type=str, default = './koopman_training_log.txt')
     parser.add_argument('--output_file', type=str, default='./koopmanMatrix.npy')
     
